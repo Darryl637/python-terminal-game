@@ -1,1 +1,31 @@
-{"name": "darryl", "gender": "Male"}
+{
+  "campaigns": [
+    {
+      "name": "Campaign 1",
+      "player_count": 1,
+      "players": [
+        {
+          "Strength": 16
+        }
+      ]
+    },
+    {
+      "name": "Campaign 2",
+      "player_count": 4,
+      "players": [
+        {
+          "Strength": 18
+        },
+        {
+          "Strength": 21
+        },
+        {
+          "Strength": 17
+        },
+        {
+          "Strength": 12
+        }
+      ]
+    }
+  ]
+}
