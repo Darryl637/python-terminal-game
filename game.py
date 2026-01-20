@@ -1,9 +1,7 @@
 import json
-import random
 from typing import TypeVar, List, Callable, Any
 
 T = TypeVar("T")
-
 
 NEW_GAME = 0
 
@@ -11,13 +9,14 @@ STATS = ["Strength", "Dexterity", "Wisdom", "Intelligence", "Consitution"]
 
 
 # Using to check if index value is there, if not default value provided
-def get_index(list: List[T], index: int, default: T):
+def get_index(list: List[T], index: int, default: T) -> T:
+    if index < 0:
+        raise IndexError
     if index < len(list):
         return list[index]
     return default
 
 
-#
 def is_valid(*args):
     return True
 
@@ -34,30 +33,44 @@ def get_number(prompt: str, validator: Callable[[int], bool] = is_valid) -> int:
         print("Try again")
 
 
-def set_state_with_line(map: dict[str, Any], path, prompt, skip_if_has_value=False):
+def set_state_with_line(
+    map: dict[str, Any], path: str, prompt: str, skip_if_has_value=False
+):
     if skip_if_has_value and path in map:
         return
     map[path] = get_line(prompt)
 
 
-def set_state_with_number(map, path, prompt, validator, skip_if_has_value=False):
+def set_state_with_number(
+    map: dict[str, Any],
+    path: str,
+    prompt: str,
+    validator: Callable[[int], bool],
+    skip_if_has_value=False,
+):
     if skip_if_has_value and path in map:
         return
     map[path] = get_number(prompt, validator)
 
 
 # possible not needed now
-def set_state_with_choice(map, path, prompt, options, skip_if_has_value=False):
+def set_state_with_choice(
+    map: dict[str, Any],
+    path: str,
+    prompt: str,
+    options: List[str],
+    skip_if_has_value=False,
+):
     if skip_if_has_value and path in map:
         return
     map[path] = get_choice(prompt, options)
 
 
-def get_line(prompt):
+def get_line(prompt: str):
     return input(prompt + "\n")
 
 
-def get_choice(prompt, options, returns_index=False):
+def get_choice(prompt: str, options: List[str], returns_index=False) -> str | int:
     while True:
         try:
             print(prompt)
@@ -83,7 +96,7 @@ class Game:
         self.load_state()
 
     def start(self):
-        self.campaign = self.choose_campaign()
+        self.campaign = self.choose_campaign()  # -> magic -> function
         print(self.campaign["name"])
         set_state_with_number(
             self.campaign,
@@ -120,7 +133,7 @@ class Game:
             return campaign
         return campaigns[option - 1]
 
-    def pick_stats(self, character):
+    def pick_stats(self, character: dict[str, Any]):
         # When using self here does it mean the names in characters is the instance
         set_state_with_line(character, "name", "What is your characters name?", True)
         self.save_state()
@@ -130,7 +143,7 @@ class Game:
             already_allocated_stat = character.get(stat, 0)
             stat_pool = stat_pool - already_allocated_stat
 
-        def validate_stat(stat):
+        def validate_stat(stat: int):
             return 0 <= stat and stat <= stat_pool
 
         if stat_pool > 0:

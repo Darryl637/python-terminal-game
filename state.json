@@ -5,75 +5,12 @@
       "character_count": 1,
       "characters": [
         {
-          "name": "jenny",
+          "name": "2",
           "Strength": 15,
-          "Dexterity": 10,
-          "Wisdom": 20,
-          "Intelligence": 20,
-          "Consitution": 10
-        },
-        {
-          "name": "jenny",
-          "Strength": 15,
-          "Dexterity": 10,
-          "Wisdom": 20,
-          "Intelligence": 20,
-          "Consitution": 10
-        }
-      ]
-    },
-    {
-      "name": "Campaign 2"
-    },
-    {
-      "name": "Campaign 3",
-      "character_count": 2,
-      "characters": [
-        {
-          "name": "jim",
-          "Strength": 15,
-          "Dexterity": 20,
-          "Wisdom": 40,
-          "Intelligence": 0,
-          "Consitution": 0
-        },
-        {
-          "name": "tim",
-          "Strength": 75,
-          "Dexterity": 0,
-          "Wisdom": 0,
-          "Intelligence": 0,
-          "Consitution": 0
-        }
-      ]
-    },
-    {
-      "name": "Campaign 4",
-      "character_count": 3,
-      "characters": [
-        {
-          "name": "thor",
-          "Strength": 20,
-          "Dexterity": 20,
+          "Dexterity": 15,
           "Wisdom": 15,
           "Intelligence": 15,
-          "Consitution": 5
-        },
-        {
-          "name": "starlord",
-          "Strength": 35,
-          "Dexterity": 34,
-          "Wisdom": 6,
-          "Intelligence": 0,
-          "Consitution": 0
-        },
-        {
-          "name": "rocket",
-          "Strength": 53,
-          "Dexterity": 21,
-          "Wisdom": 1,
-          "Intelligence": 0,
-          "Consitution": 0
+          "Consitution": 15
         }
       ]
     }
