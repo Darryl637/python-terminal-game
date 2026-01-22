@@ -1,4 +1,10 @@
-from game import get_index, get_number, set_state_with_line
+from game import (
+    get_index,
+    get_number,
+    set_state_with_line,
+    set_state_with_number,
+    is_valid,
+)
 from unittest import mock
 import pytest
 
@@ -66,3 +72,26 @@ def test__set_state_with_line__stores_line():
         skip_if_has_value = False
         set_state_with_line(map, path, prompt, skip_if_has_value)
         assert map[path] == user_input
+
+
+def test__set_state_with_number__it_skips():
+    path = "zaboomafom"
+    map = {
+        path: 4,
+    }
+    prompt = "testingwords"
+    skip_if_has_value = True
+    set_state_with_number(map, path, prompt, is_valid, skip_if_has_value)
+
+
+def test__set_state_with_number__stores_number():
+    user_input = "3"
+    path = "zaboomafom"
+    map = {
+        path: 4,
+    }
+    with mock.patch("builtins.input", side_effect=[user_input]):
+        prompt = "testingwords"
+        skip_if_has_value = False
+        set_state_with_number(map, path, prompt, is_valid, skip_if_has_value)
+        assert map[path] == int(user_input)
