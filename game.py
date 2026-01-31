@@ -1,5 +1,6 @@
 import json
 from typing import TypeVar, List, Callable, Any
+from colorama import Fore, Style, init
 
 T = TypeVar("T")
 
@@ -28,6 +29,8 @@ def get_number(prompt: str, validator: Callable[[int], bool] = is_valid) -> int:
             number = int(input())
             if validator(number):
                 return number
+        except KeyboardInterrupt:
+            exit(0)
         except:
             pass
         print("Try again")
@@ -70,7 +73,9 @@ def get_line(prompt: str):
     return input(prompt + "\n")
 
 
-def get_choice(prompt: str, options: List[str], returns_index=False) -> str | int:
+def get_choice(
+    prompt: str, options: List[str], returns_index=False, allows_free_form=False
+) -> str | int:
     while True:
         try:
             print(prompt)
@@ -82,13 +87,56 @@ def get_choice(prompt: str, options: List[str], returns_index=False) -> str | in
                 if returns_index:
                     return number
                 return options[number]
+        except KeyboardInterrupt:
+            exit(0)
         except:
-            pass
+            if allows_free_form:
+                return value
         print("Try again")
 
 
 def validate_campaign_player_count(number: int) -> bool:
     return number > 0 and number < 5
+
+
+def go_to_kitchen(game):
+    game.campaign["room"] = KITCHEN
+
+
+def go_to_starting_room(game):
+    game.campaign["room"] = STARTING_ROOM
+
+
+def go_to_living_room(game):
+    game.campaign["room"] = LIVING_ROOM
+
+
+class Room:
+    def __init__(self, desc, actions):
+        self.desc = desc
+        self.actions = actions
+
+
+STARTING_ROOM = "Starting room"
+KITCHEN = "Kitchen"
+LIVING_ROOM = "Living room"
+
+rooms = {
+    STARTING_ROOM: Room(
+        Fore.GREEN + "You are in the starting room\n------------------------------",
+        {"Go to the Kitchen": go_to_kitchen},
+    ),
+    KITCHEN: Room(
+        "You are in the Kitchen",
+        {
+            "Go to Starting room": go_to_starting_room,
+            "Go to Living room": go_to_living_room,
+        },
+    ),
+    LIVING_ROOM: Room(
+        "You are in the Living room", {"Go to the Kitchen": go_to_kitchen}
+    ),
+}
 
 
 class Game:
@@ -97,6 +145,7 @@ class Game:
 
     def start(self):
         self.campaign = self.choose_campaign()  # -> magic -> function
+        self.campaign["room"] = self.campaign.get("room", STARTING_ROOM)
         print(self.campaign["name"])
         set_state_with_number(
             self.campaign,
@@ -114,8 +163,26 @@ class Game:
                 characters.append(character)
             self.pick_stats(character)
 
-        # Add while loop to stay in game?
-        # while True:
+        while True:
+            room = rooms[self.campaign["room"]]
+            actions = room.actions.keys()
+            print(room.desc)
+            action = get_choice(
+                "What would you like to do?",
+                [*actions, "quit game"],
+                allows_free_form=True,
+            )
+            match action:
+                case s if s.startswith("makeroom"):
+                    command, direction, *name = s.split()
+                    name = " ".join(name)
+                    print(command)
+                    print(direction)
+                    print(name)
+                case "quit game":
+                    break
+                case _:
+                    room.actions[action](self)
 
     def choose_campaign(self):
         campaigns = self.state.get("campaigns", [])

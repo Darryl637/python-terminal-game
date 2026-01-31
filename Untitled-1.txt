@@ -1,0 +1,12 @@
+Notes:
+
+Create directions instead of integers for moving from room to room
+
+create command that can be entered to make a room. Command asks for direction, name and desc. 
+Thoughts on aproaches to this...was thinking to add to dictionary with function but we create a new function for each option of movement how can I generalize the movement functions 
+to eliminate the redundent go_to code for each room.
+
+Played with ANSI color \033[92m and looked at colorama and termcolor after importing these can I tie the ANSI to a different command.
+example -> (&RRed text&z) <---This &R makes string red &z returns to default color to continue. The idea with setting this up is to have the ability to use these colors inside other functions
+like you can make an item and in naming that item manipulate the colors of the test since this is graphicless 
+I think colors make it more fun and appealing to the eye instead of reading black text on white screen

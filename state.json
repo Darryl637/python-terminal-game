@@ -12,6 +12,53 @@
           "Intelligence": 15,
           "Consitution": 15
         }
+      ],
+      "room": "Starting room"
+    },
+    {
+      "name": "Campaign 2",
+      "character_count": 2,
+      "characters": [
+        {
+          "name": "phobos",
+          "Strength": 23,
+          "Dexterity": 23,
+          "Wisdom": 23,
+          "Intelligence": 2,
+          "Consitution": 4
+        },
+        {
+          "name": "deimos",
+          "Strength": 15,
+          "Dexterity": 15,
+          "Wisdom": 15,
+          "Intelligence": 15,
+          "Consitution": 15
+        }
+      ],
+      "room": "Starting room"
+    },
+    {
+      "name": "Campaign 3",
+      "room": "Starting room",
+      "character_count": 2,
+      "characters": [
+        {
+          "name": "darryl",
+          "Strength": 18,
+          "Dexterity": 19,
+          "Wisdom": 6,
+          "Intelligence": 30,
+          "Consitution": 2
+        },
+        {
+          "name": "lucy",
+          "Strength": 15,
+          "Dexterity": 15,
+          "Wisdom": 15,
+          "Intelligence": 15,
+          "Consitution": 15
+        }
       ]
     }
   ]
