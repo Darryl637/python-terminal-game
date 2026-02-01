@@ -10,3 +10,6 @@ Played with ANSI color \033[92m and looked at colorama and termcolor after impor
 example -> (&RRed text&z) <---This &R makes string red &z returns to default color to continue. The idea with setting this up is to have the ability to use these colors inside other functions
 like you can make an item and in naming that item manipulate the colors of the test since this is graphicless 
 I think colors make it more fun and appealing to the eye instead of reading black text on white screen
+
+courascant vnum 0 500
+kamino vnum 501 1000

@@ -99,22 +99,12 @@ def validate_campaign_player_count(number: int) -> bool:
     return number > 0 and number < 5
 
 
-def go_to_kitchen(game):
-    game.campaign["room"] = KITCHEN
+def make_room(desc, actions):
+    return {"actions": actions, "desc": desc}
 
 
-def go_to_starting_room(game):
-    game.campaign["room"] = STARTING_ROOM
-
-
-def go_to_living_room(game):
-    game.campaign["room"] = LIVING_ROOM
-
-
-class Room:
-    def __init__(self, desc, actions):
-        self.desc = desc
-        self.actions = actions
+def go_to_room(room_name):
+    return f"gotoroom {room_name}"
 
 
 STARTING_ROOM = "Starting room"
@@ -122,19 +112,19 @@ KITCHEN = "Kitchen"
 LIVING_ROOM = "Living room"
 
 rooms = {
-    STARTING_ROOM: Room(
+    STARTING_ROOM: make_room(
         Fore.GREEN + "You are in the starting room\n------------------------------",
-        {"Go to the Kitchen": go_to_kitchen},
+        {"Go to the Kitchen": go_to_room(KITCHEN)},
     ),
-    KITCHEN: Room(
+    KITCHEN: make_room(
         "You are in the Kitchen",
         {
-            "Go to Starting room": go_to_starting_room,
-            "Go to Living room": go_to_living_room,
+            "Go to Starting room": go_to_room(STARTING_ROOM),
+            "Go to Living room": go_to_room(LIVING_ROOM),
         },
     ),
-    LIVING_ROOM: Room(
-        "You are in the Living room", {"Go to the Kitchen": go_to_kitchen}
+    LIVING_ROOM: make_room(
+        "You are in the Living room", {"Go to the Kitchen": go_to_room(KITCHEN)}
     ),
 }
 
@@ -144,6 +134,7 @@ class Game:
         self.load_state()
 
     def start(self):
+        self.rooms = self.state.get("rooms", rooms)
         self.campaign = self.choose_campaign()  # -> magic -> function
         self.campaign["room"] = self.campaign.get("room", STARTING_ROOM)
         print(self.campaign["name"])
@@ -165,24 +156,30 @@ class Game:
 
         while True:
             room = rooms[self.campaign["room"]]
-            actions = room.actions.keys()
-            print(room.desc)
+            actions = room["actions"].keys()
+            print(room["desc"])
             action = get_choice(
                 "What would you like to do?",
                 [*actions, "quit game"],
                 allows_free_form=True,
             )
             match action:
-                case s if s.startswith("makeroom"):
-                    command, direction, *name = s.split()
-                    name = " ".join(name)
-                    print(command)
-                    print(direction)
-                    print(name)
+                case s if s.startswith("makeroom "):
+                    command, direction, *room_name = s.split()
+                    room_name = " ".join(room_name)
+                    room["actions"][direction] = go_to_room(room_name)
+                    self.rooms[room_name] = make_room(room_name, {})
                 case "quit game":
                     break
                 case _:
-                    room.actions[action](self)
+                    match room["actions"][action]:
+                        case s if s.startswith("gotoroom "):
+                            command, *room_name = s.split()
+                            room_name = " ".join(room_name)
+                            self.campaign["room"] = room_name
+                        case _:
+                            pass
+            self.save_state()
 
     def choose_campaign(self):
         campaigns = self.state.get("campaigns", [])
