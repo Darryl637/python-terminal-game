@@ -99,12 +99,21 @@ def validate_campaign_player_count(number: int) -> bool:
     return number > 0 and number < 5
 
 
+GO_TO_ROOM = "gotoroom "
+
+
+def get_room_name(action_name: str) -> str:
+    if action_name.startswith(GO_TO_ROOM):
+        return action_name[len(GO_TO_ROOM) :]
+    return ""
+
+
 def make_room(desc, actions):
     return {"actions": actions, "desc": desc}
 
 
 def go_to_room(room_name):
-    return f"gotoroom {room_name}"
+    return f"{GO_TO_ROOM}{room_name}"
 
 
 STARTING_ROOM = "Starting room"
@@ -133,6 +142,7 @@ class Game:
     def __init__(self):
         self.load_state()
 
+    # make rooms save to json upon making room
     def start(self):
         self.rooms = self.state.get("rooms", rooms)
         self.campaign = self.choose_campaign()  # -> magic -> function
@@ -156,30 +166,42 @@ class Game:
 
         while True:
             room = rooms[self.campaign["room"]]
-            actions = room["actions"].keys()
+            actions = self.get_actions()
             print(room["desc"])
             action = get_choice(
                 "What would you like to do?",
                 [*actions, "quit game"],
                 allows_free_form=True,
+                returns_index=True,
             )
             match action:
-                case s if s.startswith("makeroom "):
-                    command, direction, *room_name = s.split()
-                    room_name = " ".join(room_name)
-                    room["actions"][direction] = go_to_room(room_name)
-                    self.rooms[room_name] = make_room(room_name, {})
-                case "quit game":
-                    break
-                case _:
-                    match room["actions"][action]:
-                        case s if s.startswith("gotoroom "):
+                case i if isinstance(i, int):
+                    direction = list(room["actions"].keys())[action]
+                    match room["actions"][direction]:
+                        case s if s.startswith(GO_TO_ROOM):
                             command, *room_name = s.split()
                             room_name = " ".join(room_name)
                             self.campaign["room"] = room_name
                         case _:
                             pass
+                case s if s.startswith("makeroom "):
+                    command, direction, *room_name = s.split()
+                    room_name = " ".join(room_name)
+                    room["actions"][direction] = go_to_room(room_name)
+                    self.rooms[room_name] = make_room(room_name, {})
+                case "quit game":  # get quit funtioning
+                    break
+
             self.save_state()
+
+    def get_actions(self):
+        actions = []
+        room_name = self.campaign["room"]
+        room = self.rooms[room_name]
+        for key, value in room["actions"].items():
+            room_name = get_room_name(value)
+            actions.append(f"{key} - {room_name}")
+        return actions
 
     def choose_campaign(self):
         campaigns = self.state.get("campaigns", [])
