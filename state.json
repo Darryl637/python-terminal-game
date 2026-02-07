@@ -2,7 +2,7 @@
   "campaigns": [
     {
       "name": "Campaign 1",
-      "room": "Kamino lab room",
+      "room_id": "ef90eb5c-05f4-4fe8-8d4e-52cd7412d52a",
       "character_count": 1,
       "characters": [
         {
@@ -16,4 +16,21 @@
       ]
     }
   ],
+  "rooms": {
+    "vnum0": {
+      "name": "Cloning tube",
+      "actions": {
+        "north": {
+          "action": "gotoroom",
+          "room_id": "ef90eb5c-05f4-4fe8-8d4e-52cd7412d52a"
+        }
+      },
+      "desc": "You are in a cloning tube\n"
+    },
+    "ef90eb5c-05f4-4fe8-8d4e-52cd7412d52a": {
+      "name": "hallway",
+      "actions": {},
+      "desc": ""
+    }
+  }
 }

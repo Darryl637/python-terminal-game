@@ -1,12 +1,17 @@
 import json
 from typing import TypeVar, List, Callable, Any
 from colorama import Fore, Style, init
+import uuid
 
 T = TypeVar("T")
 
 NEW_GAME = 0
 
 STATS = ["Strength", "Dexterity", "Wisdom", "Intelligence", "Consitution"]
+
+
+def generate_id():
+    return str(uuid.uuid4())
 
 
 # Using to check if index value is there, if not default value provided
@@ -99,30 +104,24 @@ def validate_campaign_player_count(number: int) -> bool:
     return number > 0 and number < 5
 
 
-GO_TO_ROOM = "gotoroom "
+GO_TO_ROOM = "gotoroom"
 
 
-def get_room_name(action_name: str) -> str:
-    if action_name.startswith(GO_TO_ROOM):
-        return action_name[len(GO_TO_ROOM) :]
-    return ""
+def make_room(name, desc, actions):
+    return {"name": name, "actions": actions, "desc": desc}
 
 
-def make_room(desc, actions):
-    return {"actions": actions, "desc": desc}
+def go_to_room(room_id):
+    return {"action": GO_TO_ROOM, "room_id": room_id}
 
 
-def go_to_room(room_name):
-    return f"{GO_TO_ROOM}{room_name}"
-
-
-CLONING_TUBE = "Cloning tube"
-
+CLONING_TUBE_ID = "vnum0"
 
 rooms = {
-    CLONING_TUBE: make_room(
+    CLONING_TUBE_ID: make_room(
+        "Cloning tube",
         "You are in a cloning tube\n",
-        {"Kamino lab room": "none"},
+        {},
     ),
 }
 
@@ -131,11 +130,20 @@ class Game:
     def __init__(self):
         self.load_state()
 
+    def get_room_name(self, action: dict) -> str:
+
+        rooms = self.rooms
+        print(action, type(action))
+        if action["action"] == GO_TO_ROOM:
+            room_id = action["room_id"]
+            return rooms[room_id]["name"]
+        return ""
+
     # make rooms save to json upon making room
     def start(self):
         self.rooms = self.state.get("rooms", rooms)
         self.campaign = self.choose_campaign()  # -> magic -> function
-        self.campaign["room"] = self.campaign.get("room", CLONING_TUBE)
+        self.campaign["room_id"] = self.campaign.get("room_id", CLONING_TUBE_ID)
         print(self.campaign["name"])
         set_state_with_number(
             self.campaign,
@@ -154,7 +162,7 @@ class Game:
             self.pick_stats(character)
 
         while True:
-            room = rooms[self.campaign["room"]]
+            room = rooms[self.campaign["room_id"]]
             actions = self.get_actions()
             print(room["desc"])
             action = get_choice(
@@ -167,17 +175,18 @@ class Game:
                 case i if isinstance(i, int):
                     direction = list(room["actions"].keys())[action]
                     match room["actions"][direction]:
-                        case s if s.startswith(GO_TO_ROOM):
-                            command, *room_name = s.split()
-                            room_name = " ".join(room_name)
-                            self.campaign["room"] = room_name
+                        case a if a["action"] == (GO_TO_ROOM):
+                            room_id = a["room_id"]
+
+                            self.campaign["room_id"] = room_id
                         case _:
                             pass
                 case s if s.startswith("makeroom "):
                     command, direction, *room_name = s.split()
                     room_name = " ".join(room_name)
-                    room["actions"][direction] = go_to_room(room_name)
-                    self.rooms[room_name] = make_room(room_name, {})
+                    room_id = generate_id()
+                    room["actions"][direction] = go_to_room(room_id)
+                    self.rooms[room_id] = make_room(room_name, "", {})
                     self.state["rooms"] = self.rooms
                 case "quit game":  # get quit funtioning
                     break
@@ -186,10 +195,11 @@ class Game:
 
     def get_actions(self):
         actions = []
-        room_name = self.campaign["room"]
+        room_name = self.campaign["room_id"]
         room = self.rooms[room_name]
         for key, value in room["actions"].items():
-            room_name = get_room_name(value)
+            print(key, value)
+            room_name = self.get_room_name(value)
             actions.append(f"{key} - {room_name}")
         return actions
 
