@@ -116,24 +116,13 @@ def go_to_room(room_name):
     return f"{GO_TO_ROOM}{room_name}"
 
 
-STARTING_ROOM = "Starting room"
-KITCHEN = "Kitchen"
-LIVING_ROOM = "Living room"
+CLONING_TUBE = "Cloning tube"
+
 
 rooms = {
-    STARTING_ROOM: make_room(
-        Fore.GREEN + "You are in the starting room\n------------------------------",
-        {"Go to the Kitchen": go_to_room(KITCHEN)},
-    ),
-    KITCHEN: make_room(
-        "You are in the Kitchen",
-        {
-            "Go to Starting room": go_to_room(STARTING_ROOM),
-            "Go to Living room": go_to_room(LIVING_ROOM),
-        },
-    ),
-    LIVING_ROOM: make_room(
-        "You are in the Living room", {"Go to the Kitchen": go_to_room(KITCHEN)}
+    CLONING_TUBE: make_room(
+        "You are in a cloning tube\n",
+        {"Kamino lab room": "none"},
     ),
 }
 
@@ -146,7 +135,7 @@ class Game:
     def start(self):
         self.rooms = self.state.get("rooms", rooms)
         self.campaign = self.choose_campaign()  # -> magic -> function
-        self.campaign["room"] = self.campaign.get("room", STARTING_ROOM)
+        self.campaign["room"] = self.campaign.get("room", CLONING_TUBE)
         print(self.campaign["name"])
         set_state_with_number(
             self.campaign,
@@ -189,6 +178,7 @@ class Game:
                     room_name = " ".join(room_name)
                     room["actions"][direction] = go_to_room(room_name)
                     self.rooms[room_name] = make_room(room_name, {})
+                    self.state["rooms"] = self.rooms
                 case "quit game":  # get quit funtioning
                     break
 
