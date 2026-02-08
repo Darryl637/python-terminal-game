@@ -2,7 +2,7 @@
   "campaigns": [
     {
       "name": "Campaign 1",
-      "room_id": "ef90eb5c-05f4-4fe8-8d4e-52cd7412d52a",
+      "room_id": "6841a575-4bb9-41ee-b68f-0307c72fcae3",
       "character_count": 1,
       "characters": [
         {
@@ -22,13 +22,13 @@
       "actions": {
         "north": {
           "action": "gotoroom",
-          "room_id": "ef90eb5c-05f4-4fe8-8d4e-52cd7412d52a"
+          "room_id": "6841a575-4bb9-41ee-b68f-0307c72fcae3"
         }
       },
       "desc": "You are in a cloning tube\n"
     },
-    "ef90eb5c-05f4-4fe8-8d4e-52cd7412d52a": {
-      "name": "hallway",
+    "6841a575-4bb9-41ee-b68f-0307c72fcae3": {
+      "name": "loganfixedit",
       "actions": {},
       "desc": ""
     }

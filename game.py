@@ -117,7 +117,7 @@ def go_to_room(room_id):
 
 CLONING_TUBE_ID = "vnum0"
 
-rooms = {
+ROOMS = {
     CLONING_TUBE_ID: make_room(
         "Cloning tube",
         "You are in a cloning tube\n",
@@ -133,7 +133,6 @@ class Game:
     def get_room_name(self, action: dict) -> str:
 
         rooms = self.rooms
-        print(action, type(action))
         if action["action"] == GO_TO_ROOM:
             room_id = action["room_id"]
             return rooms[room_id]["name"]
@@ -141,10 +140,9 @@ class Game:
 
     # make rooms save to json upon making room
     def start(self):
-        self.rooms = self.state.get("rooms", rooms)
+        self.rooms = self.state.get("rooms", ROOMS)
         self.campaign = self.choose_campaign()  # -> magic -> function
         self.campaign["room_id"] = self.campaign.get("room_id", CLONING_TUBE_ID)
-        print(self.campaign["name"])
         set_state_with_number(
             self.campaign,
             "character_count",
@@ -162,12 +160,13 @@ class Game:
             self.pick_stats(character)
 
         while True:
-            room = rooms[self.campaign["room_id"]]
+            room_id = self.campaign["room_id"]
+            room = self.rooms[room_id]
             actions = self.get_actions()
-            print(room["desc"])
+            print(room["name"])
             action = get_choice(
                 "What would you like to do?",
-                [*actions, "quit game"],
+                [*actions],
                 allows_free_form=True,
                 returns_index=True,
             )
@@ -188,17 +187,21 @@ class Game:
                     room["actions"][direction] = go_to_room(room_id)
                     self.rooms[room_id] = make_room(room_name, "", {})
                     self.state["rooms"] = self.rooms
-                case "quit game":  # get quit funtioning
+                case s if s.startswith("setroomname "):
+                    command, *room_name = s.split()
+                    room_name = " ".join(room_name)
+                    room["name"] = room_name
+                case q if q.startswith("quit"):
+                    self.save_state()  # get quit funtioning
                     break
 
             self.save_state()
 
     def get_actions(self):
         actions = []
-        room_name = self.campaign["room_id"]
-        room = self.rooms[room_name]
+        roomid = self.campaign["room_id"]
+        room = self.rooms[roomid]
         for key, value in room["actions"].items():
-            print(key, value)
             room_name = self.get_room_name(value)
             actions.append(f"{key} - {room_name}")
         return actions
