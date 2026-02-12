@@ -2,6 +2,7 @@ import json
 from typing import TypeVar, List, Callable, Any
 from colorama import Fore, Style, init
 import uuid
+import os
 
 T = TypeVar("T")
 
@@ -133,6 +134,7 @@ class Game:
     def get_room_name(self, action: dict) -> str:
 
         rooms = self.rooms
+        print(action)
         if action["action"] == GO_TO_ROOM:
             room_id = action["room_id"]
             return rooms[room_id]["name"]
@@ -163,13 +165,20 @@ class Game:
             room_id = self.campaign["room_id"]
             room = self.rooms[room_id]
             actions = self.get_actions()
-            print(room["name"])
+            print(
+                f"({room['name']}) \n-------------------------------------------------- "
+            )
+            print(
+                f"{room['desc']} \n-------------------------------------------------- "
+            )
+
             action = get_choice(
                 "What would you like to do?",
                 [*actions],
                 allows_free_form=True,
                 returns_index=True,
             )
+            os.system("cls")
             match action:
                 case i if isinstance(i, int):
                     direction = list(room["actions"].keys())[action]
@@ -187,12 +196,39 @@ class Game:
                     room["actions"][direction] = go_to_room(room_id)
                     self.rooms[room_id] = make_room(room_name, "", {})
                     self.state["rooms"] = self.rooms
+                case s if s.startswith("makeroomc "):
+                    command, todirection, fromdirection, *room_name = s.split()
+                    room_name = " ".join(room_name)
+                    room_id = generate_id()
+                    room["actions"][todirection] = go_to_room(room_id)
+
+                    self.rooms[room_id] = make_room(
+                        room_name,
+                        "",
+                        {fromdirection: go_to_room(self.campaign["room_id"])},
+                    )
+                    self.state["rooms"] = self.rooms
                 case s if s.startswith("setroomname "):
                     command, *room_name = s.split()
                     room_name = " ".join(room_name)
                     room["name"] = room_name
+                case id if id.startswith("vin "):
+                    print(room_id)
+                case s if s.startswith("makeexit "):
+                    command, direction, room_id = s.split()
+                    room["actions"][direction] = go_to_room(room_id)
+                case d if d.startswith("roomdesc "):
+                    print("Enter new room description")
+                    room["desc"] = input()
+                case d if d.startswith("deleteroom "):
+                    command, toremove = s.split()
+
+                    del self.rooms[toremove]
+                    for room in self.rooms.values():
+                        for action_key, action_value in dict(room["actions"]).items():
+                            if action_value["room_id"] == toremove:
+                                del room["actions"][action_key]
                 case q if q.startswith("quit"):
-                    self.save_state()  # get quit funtioning
                     break
 
             self.save_state()

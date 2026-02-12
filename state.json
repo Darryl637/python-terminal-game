@@ -2,11 +2,11 @@
   "campaigns": [
     {
       "name": "Campaign 1",
-      "room_id": "6841a575-4bb9-41ee-b68f-0307c72fcae3",
+      "room_id": "9c50a5c0-e4f8-46a4-a449-c3dc874479c7",
       "character_count": 1,
       "characters": [
         {
-          "name": "darryl",
+          "name": "1",
           "Strength": 15,
           "Dexterity": 15,
           "Wisdom": 15,
@@ -22,14 +22,33 @@
       "actions": {
         "north": {
           "action": "gotoroom",
-          "room_id": "6841a575-4bb9-41ee-b68f-0307c72fcae3"
+          "room_id": "9c50a5c0-e4f8-46a4-a449-c3dc874479c7"
         }
       },
       "desc": "You are in a cloning tube\n"
     },
-    "6841a575-4bb9-41ee-b68f-0307c72fcae3": {
-      "name": "loganfixedit",
-      "actions": {},
+    "9c50a5c0-e4f8-46a4-a449-c3dc874479c7": {
+      "name": "Cloning lab",
+      "actions": {
+        "south": {
+          "action": "gotoroom",
+          "room_id": "vnum0"
+        },
+        "west": {
+          "action": "gotoroom",
+          "room_id": "492defc9-49c7-471e-a5b1-80f392a911b9"
+        }
+      },
+      "desc": ""
+    },
+    "492defc9-49c7-471e-a5b1-80f392a911b9": {
+      "name": "Basic skills",
+      "actions": {
+        "east": {
+          "action": "gotoroom",
+          "room_id": "9c50a5c0-e4f8-46a4-a449-c3dc874479c7"
+        }
+      },
       "desc": ""
     }
   }
