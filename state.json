@@ -37,9 +37,13 @@
         "west": {
           "action": "gotoroom",
           "room_id": "492defc9-49c7-471e-a5b1-80f392a911b9"
+        },
+        "north": {
+          "action": "gotoroom",
+          "room_id": "ddadc762-37fe-4504-aec9-4889736e6c6a"
         }
       },
-      "desc": ""
+      "desc": "There are large tubes of liquids lining the outer edges of the room. White desks with micropscopes run in pairs down the center of the room. "
     },
     "492defc9-49c7-471e-a5b1-80f392a911b9": {
       "name": "Basic skills",
@@ -50,6 +54,16 @@
         }
       },
       "desc": ""
+    },
+    "ddadc762-37fe-4504-aec9-4889736e6c6a": {
+      "name": "Long hallway",
+      "actions": {
+        "south": {
+          "action": "gotoroom",
+          "room_id": "9c50a5c0-e4f8-46a4-a449-c3dc874479c7"
+        }
+      },
+      "desc": "Bright white hallway. Smells like cleaner."
     }
   }
 }

@@ -1,6 +1,6 @@
 import json
 from typing import TypeVar, List, Callable, Any
-from colorama import Fore, Style, init
+from colorama import Fore, Style, init, Back
 import uuid
 import os
 
@@ -134,7 +134,7 @@ class Game:
     def get_room_name(self, action: dict) -> str:
 
         rooms = self.rooms
-        print(action)
+
         if action["action"] == GO_TO_ROOM:
             room_id = action["room_id"]
             return rooms[room_id]["name"]
@@ -173,7 +173,7 @@ class Game:
             )
 
             action = get_choice(
-                "What would you like to do?",
+                "Obvious exits:",
                 [*actions],
                 allows_free_form=True,
                 returns_index=True,
@@ -222,12 +222,14 @@ class Game:
                     room["desc"] = input()
                 case d if d.startswith("deleteroom "):
                     command, toremove = s.split()
-
                     del self.rooms[toremove]
                     for room in self.rooms.values():
                         for action_key, action_value in dict(room["actions"]).items():
                             if action_value["room_id"] == toremove:
                                 del room["actions"][action_key]
+                case s if s.startswith("score"):
+                    print(self.state["campaigns"]["characters"][0]["name"])
+
                 case q if q.startswith("quit"):
                     break
 
