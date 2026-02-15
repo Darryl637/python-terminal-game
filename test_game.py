@@ -4,9 +4,26 @@ from game import (
     set_state_with_line,
     set_state_with_number,
     is_valid,
+    generate_id,
+    validate_campaign_player_count,
 )
 from unittest import mock
 import pytest
+
+
+def test_generate_id():
+    id1 = generate_id()
+    id2 = generate_id()
+    assert id1 != id2
+
+
+@pytest.mark.parametrize(
+    "number_of_players, is_valid",
+    [(-1, False), (0, False), (1, True), (2, True), (3, True), (4, True), (5, False)],
+)
+def test_validate_campaign_player_count(number_of_players, is_valid):
+    output = validate_campaign_player_count(number_of_players)
+    assert output == is_valid
 
 
 def test__get_index__index_in_range():

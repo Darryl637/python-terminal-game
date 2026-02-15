@@ -8,7 +8,7 @@ T = TypeVar("T")
 
 NEW_GAME = 0
 
-STATS = ["Strength", "Dexterity", "Wisdom", "Intelligence", "Consitution"]
+STATS = ["Strength", "Dexterity", "Wisdom", "Intelligence", "Constitution"]
 
 
 def generate_id():
@@ -166,14 +166,14 @@ class Game:
             room = self.rooms[room_id]
             actions = self.get_actions()
             print(
-                f"({room['name']}) \n-------------------------------------------------- "
+                f"({room['name']}) \n--------------------------------------------------{Fore.RESET} "
             )
             print(
                 f"{room['desc']} \n-------------------------------------------------- "
             )
 
             action = get_choice(
-                "Obvious exits:",
+                "Obvious exits:             ",
                 [*actions],
                 allows_free_form=True,
                 returns_index=True,
@@ -228,8 +228,14 @@ class Game:
                             if action_value["room_id"] == toremove:
                                 del room["actions"][action_key]
                 case s if s.startswith("score"):
-                    print(self.state["campaigns"]["characters"][0]["name"])
+                    for character in characters:
+                        print(f"-= Score for {character['name']} =-")
+                        output = []
+                        for stat in STATS:
+                            output.append(f"{stat[0:3]}: {character[stat]}")
 
+                        print(", ".join(output))
+                        print()
                 case q if q.startswith("quit"):
                     break
 
