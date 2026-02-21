@@ -1,107 +1,76 @@
 {
   "campaigns": [
     {
-      "name": "Campaign 1",
-      "room_id": "9c50a5c0-e4f8-46a4-a449-c3dc874479c7",
-      "character_count": 1,
       "characters": [
         {
-          "name": "darryl",
+          "name": "testchar",
           "Strength": 15,
           "Dexterity": 15,
           "Wisdom": 15,
           "Intelligence": 15,
           "Constitution": 15
         }
-      ]
+      ],
+      "name": "Campaign 1",
+      "room_id": "vnum0",
+      "character_count": 1
     },
     {
+      "characters": [
+        {
+          "name": "bobby",
+          "Strength": 15,
+          "Dexterity": 15,
+          "Wisdom": 15,
+          "Intelligence": 15,
+          "Constitution": 15
+        }
+      ],
       "name": "Campaign 2",
       "room_id": "vnum0",
-      "character_count": 1,
-      "characters": [
-        {
-          "name": "jennifer",
-          "Strength": 10,
-          "Dexterity": 10,
-          "Wisdom": 20,
-          "Intelligence": 15,
-          "Constitution": 20
-        }
-      ]
+      "character_count": 1
     },
     {
-      "name": "Campaign 3",
-      "room_id": "vnum0",
-      "character_count": 2,
       "characters": [
         {
-          "name": "toby",
+          "name": "tommy",
           "Strength": 15,
           "Dexterity": 15,
           "Wisdom": 15,
           "Intelligence": 15,
           "Constitution": 15
-        },
-        {
-          "name": "roby",
-          "Strength": 15,
-          "Dexterity": 25,
-          "Wisdom": 5,
-          "Intelligence": 25,
-          "Constitution": 5
         }
-      ]
+      ],
+      "name": "Campaign 3",
+      "room_id": "vnum0",
+      "character_count": 1
     }
   ],
   "rooms": {
     "vnum0": {
       "name": "Cloning tube",
+      "desc": "newroom",
       "actions": {
         "north": {
           "action": "gotoroom",
-          "room_id": "9c50a5c0-e4f8-46a4-a449-c3dc874479c7"
+          "room_id": "2b879932-2814-4129-a2b5-5c02283583ab"
         }
-      },
-      "desc": "You are in a cloning tube\n"
+      }
     },
-    "9c50a5c0-e4f8-46a4-a449-c3dc874479c7": {
-      "name": "Cloning lab",
+    "1875378e-06eb-4e09-8b64-756787030532": {
+      "name": "hallway",
+      "desc": "",
+      "actions": {}
+    },
+    "2b879932-2814-4129-a2b5-5c02283583ab": {
+      "name": "hallway",
+      "desc": "",
       "actions": {
         "south": {
           "action": "gotoroom",
           "room_id": "vnum0"
-        },
-        "west": {
-          "action": "gotoroom",
-          "room_id": "492defc9-49c7-471e-a5b1-80f392a911b9"
-        },
-        "north": {
-          "action": "gotoroom",
-          "room_id": "ddadc762-37fe-4504-aec9-4889736e6c6a"
         }
-      },
-      "desc": "There are large tubes of liquids lining the outer edges of the room. White desks with micropscopes run in pairs down the center of the room. "
-    },
-    "492defc9-49c7-471e-a5b1-80f392a911b9": {
-      "name": "Basic skills",
-      "actions": {
-        "east": {
-          "action": "gotoroom",
-          "room_id": "9c50a5c0-e4f8-46a4-a449-c3dc874479c7"
-        }
-      },
-      "desc": ""
-    },
-    "ddadc762-37fe-4504-aec9-4889736e6c6a": {
-      "name": "Long hallway",
-      "actions": {
-        "south": {
-          "action": "gotoroom",
-          "room_id": "9c50a5c0-e4f8-46a4-a449-c3dc874479c7"
-        }
-      },
-      "desc": "Brightly lite white hallway."
+      }
     }
   }
 }
