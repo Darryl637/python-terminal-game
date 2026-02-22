@@ -12,7 +12,7 @@
         }
       ],
       "name": "Campaign 1",
-      "room_id": "vnum0",
+      "room_id": "2b879932-2814-4129-a2b5-5c02283583ab",
       "character_count": 1
     },
     {
@@ -27,7 +27,7 @@
         }
       ],
       "name": "Campaign 2",
-      "room_id": "vnum0",
+      "room_id": "2b879932-2814-4129-a2b5-5c02283583ab",
       "character_count": 1
     },
     {
@@ -48,8 +48,8 @@
   ],
   "rooms": {
     "vnum0": {
-      "name": "Cloning tube",
-      "desc": "newroom",
+      "name": "Academy Entrance",
+      "desc": "You step into the gleaming entrance hall of the academy. Polished durasteel\nfloors reflectthe glow of overhead lights, and banners of past graduates hang\nproudly along the walls.A hovering droid floats nearby, scanning newcomers with\nquiet beeps.",
       "actions": {
         "north": {
           "action": "gotoroom",
@@ -63,12 +63,26 @@
       "actions": {}
     },
     "2b879932-2814-4129-a2b5-5c02283583ab": {
-      "name": "hallway",
-      "desc": "",
+      "name": "Basic Commands",
+      "desc": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla mattis magna ac\nmassa fermentum, eu dapibus augue facilisis. Nam tempus vestibulum velit, eget\nlobortis lorem blandit ut. Integer porta magna vel diam efficitur pretium. Proin\nquis diam quis erat posuere semper in vel tellus. Proin et tellus laoreet,\nlaoreet ipsum eget, sodales felis. Nunc turpis metus, sodales ut vestibulum nec,\ncondimentum ac sem. Sed et facilisis sem. Aliquam erat volutpat. Cras vitae nisl\nlobortis, suscipit metus a, posuere orci. Phasellus ultricies sollicitudin felis\nvitae feugiat. Quisque faucibus laoreet lacus, commodo facilisis orci eleifend\nid. Aliquam sed porttitor tortor.\n\n\nLorem ipsum dolor sit amet, consectetur\nadipiscing elit. Nulla mattis magna ac massa fermentum, eu dapibus augue\nfacilisis. Nam tempus vestibulum velit, eget lobortis lorem blandit ut. Integer\nporta magna vel diam efficitur pretium. Proin quis diam quis erat posuere semper\nin vel tellus. Proin et tellus laoreet, laoreet ipsum eget, sodales felis. Nunc\nturpis metus, sodales ut vestibulum nec, condimentum ac sem. Sed et facilisis\nsem. Aliquam erat volutpat. Cras vitae nisl lobortis, suscipit metus a, posuere\norci. Phasellus ultricies sollicitudin felis vitae feugiat. Quisque faucibus\nlaoreet lacus, commodo facilisis orci eleifend id. Aliquam sed porttitor tortor.",
       "actions": {
         "south": {
           "action": "gotoroom",
           "room_id": "vnum0"
+        },
+        "west": {
+          "action": "gotoroom",
+          "room_id": "2512b176-4db6-4931-8549-c2266c9a5378"
+        }
+      }
+    },
+    "2512b176-4db6-4931-8549-c2266c9a5378": {
+      "name": "Equipment Training",
+      "desc": "this line  this line",
+      "actions": {
+        "east": {
+          "action": "gotoroom",
+          "room_id": "2b879932-2814-4129-a2b5-5c02283583ab"
         }
       }
     }

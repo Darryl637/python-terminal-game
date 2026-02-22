@@ -1,160 +1,18 @@
-import json
-from typing import TypeVar, List, Callable, Any, Literal
 from colorama import Fore, Style, init, Back
-import uuid
+
 import os
-from pydantic import BaseModel
-
-T = TypeVar("T")
-
-NEW_GAME = 0
-
-STATS = ["Strength", "Dexterity", "Wisdom", "Intelligence", "Constitution"]
-
-
-class Character(BaseModel):
-    name: str = ""
-    Strength: int = 0
-    Dexterity: int = 0
-    Wisdom: int = 0
-    Intelligence: int = 0
-    Constitution: int = 0
-
-
-class Campaign(BaseModel):
-    characters: List[Character] = []
-    name: str = ""
-    room_id: str = ""
-    character_count: int = 0
-
-
-class State(BaseModel):
-    campaigns: List[Campaign] = []
-    rooms: dict[
-        str, "Room"
-    ] = {}  # "Room" the quotes are saying to wait until file is loaded
-
-
-class Room(BaseModel):
-    name: str = ""
-    desc: str = ""
-    actions: dict[str, "Action"] = {}
-
-
-class GoToRoomAction(BaseModel):
-    action: Literal["gotoroom"] = "gotoroom"
-    room_id: str
-
-
-Action = GoToRoomAction
-
-
-def generate_id():
-    return str(uuid.uuid4())
-
-
-# Using to check if index value is there, if not default value provided
-def get_index(list: List[T], index: int, default: T) -> T:
-    if index < 0:
-        raise IndexError
-    if index < len(list):
-        return list[index]
-    return default
-
-
-def is_valid(*args):
-    return True
-
-
-def get_number(prompt: str, validator: Callable[[int], bool] = is_valid) -> int:
-    while True:
-        print(prompt)
-        try:
-            number = int(input())
-            if validator(number):
-                return number
-        except KeyboardInterrupt:
-            exit(0)
-        except:
-            pass
-        print("Try again")
-
-
-def set_state_with_line(instance: Any, path: str, prompt: str, skip_if_has_value=False):
-    value = getattr(instance, path)
-    if skip_if_has_value and value:
-        return
-    setattr(instance, path, get_line(prompt))
-
-
-def set_state_with_number(
-    instance: Any,
-    path: str,
-    prompt: str,
-    validator: Callable[[int], bool],
-    skip_if_has_value=False,
-):
-    value = getattr(instance, path)
-    if skip_if_has_value and value:
-        return
-    setattr(instance, path, get_number(prompt, validator))
-
-
-# possible not needed now
-def set_state_with_choice(
-    map: dict[str, Any],
-    path: str,
-    prompt: str,
-    options: List[str],
-    skip_if_has_value=False,
-):
-    if skip_if_has_value and path in map:
-        return
-    map[path] = get_choice(prompt, options)
-
-
-def get_line(prompt: str):
-    return input(prompt + "\n")
-
-
-def get_choice(
-    prompt: str, options: List[str], returns_index=False, allows_free_form=False
-) -> str | int:
-    while True:
-        try:
-            print(prompt)
-            for index, option in enumerate(options):
-                print(f"{index + 1}. {option}")
-            value = input()
-            number = int(value) - 1
-            if 0 <= number and number < len(options):
-                if returns_index:
-                    return number
-                return options[number]
-        except KeyboardInterrupt:
-            exit(0)
-        except:
-            if allows_free_form:
-                return value
-        print("Try again")
-
-
-def validate_campaign_player_count(number: int) -> bool:
-    return number > 0 and number < 5
-
-
-GO_TO_ROOM = "gotoroom"
-
-
-CLONING_TUBE_ID = "vnum0"
-
-ROOMS = {
-    CLONING_TUBE_ID: Room(
-        name="Cloning tube",
-        desc="You are in a cloning tube\n",
-        actions={},
-    ),
-}
+import textwrap
+from models import State, Character, Room, GoToRoomAction, Campaign
+from constants import ROOMS, NEW_GAME, CLONING_TUBE_ID, STATS
+from utility import (
+    generate_id,
+    get_choice,
+    get_index,
+    get_number,
+    set_state_with_line,
+    set_state_with_number,
+    validate_campaign_player_count,
+)
 
 
 class Game:
@@ -196,9 +54,11 @@ class Game:
             room = self.rooms[room_id]
             actions = self.get_actions()
             print(
-                f"({room.name}) \n--------------------------------------------------{Fore.RESET} "
+                f"({room.name}) \n--------------------------------------------------------------------------------{Fore.RESET} "
             )
-            print(f"{room.desc} \n-------------------------------------------------- ")
+            print(
+                f"{room.desc} \n--------------------------------------------------------------------------------"
+            )
 
             action = get_choice(
                 "Obvious exits:             ",
@@ -251,7 +111,21 @@ class Game:
                     room.actions[direction] = GoToRoomAction(room_id=room_id)
                 case d if d.startswith("roomdesc "):
                     print("Enter new room description")
-                    room.desc = input()  # changed .desc from ["desc"]
+                    print("Type CLOSE on new line to finalize description")
+                    buffer = []
+                    while True:
+                        line = input()
+                        if line.strip().upper() == "CLOSE":
+                            break
+                        buffer.append(line)
+                        buffer_needs_format = "\n".join(line.strip() for line in buffer)
+                        room.desc = textwrap.fill(
+                            buffer_needs_format,
+                            replace_whitespace=False,
+                            width=80,
+                            break_long_words=False,
+                            break_on_hyphens=False,
+                        )
                 case d if d.startswith("deleteroom "):
                     command, toremove = s.split()
                     del self.rooms[toremove]

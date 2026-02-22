@@ -1,4 +1,4 @@
-from game import (
+from utility import (
     get_index,
     get_number,
     set_state_with_line,
