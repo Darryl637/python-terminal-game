@@ -1,9 +1,9 @@
 from colorama import Fore, Style, init, Back
-
+from models import ROOMS
 import os
 import textwrap
 from models import State, Character, Room, GoToRoomAction, Campaign
-from constants import ROOMS, NEW_GAME, CLONING_TUBE_ID, STATS
+from constants import NEW_GAME, STATS
 from utility import (
     generate_id,
     get_choice,
@@ -16,6 +16,8 @@ from utility import (
 
 
 class Game:
+    state: State
+
     def __init__(self):
         self.load_state()
 
@@ -31,26 +33,26 @@ class Game:
     # make rooms save to json upon making room
     def start(self):
         self.rooms = self.state.rooms or ROOMS
-        self.campaign = self.choose_campaign()  # -> magic -> function
-        self.campaign.room_id = self.campaign.room_id or CLONING_TUBE_ID
+        self.state.choose_campaign()  # -> magic -> function
+        self.save_state()
         set_state_with_number(
-            self.campaign,
+            self.state.campaign,
             "character_count",
             "How many characters are in your campaign? (1-4)",
             validate_campaign_player_count,
             skip_if_has_value=True,
         )
         self.save_state()
-        characters = self.campaign.characters or []
-        self.campaign.characters = characters
-        for i in range(self.campaign.character_count):
+        characters = self.state.campaign.characters or []
+        self.state.campaign.characters = characters
+        for i in range(self.state.campaign.character_count):
             character = get_index(characters, i, Character())
             if i >= len(characters):
                 characters.append(character)
             self.pick_stats(character)
 
         while True:
-            room_id = self.campaign.room_id
+            room_id = self.state.campaign.room_id
             room = self.rooms[room_id]
             actions = self.get_actions()
             print(
@@ -76,16 +78,14 @@ class Game:
                         case a if isinstance(a, GoToRoomAction):
                             room_id = a.room_id
 
-                            self.campaign.room_id = room_id
+                            self.state.campaign.room_id = room_id
                         case _:
                             pass
                 case s if s.startswith("makeroom "):
                     command, direction, *room_name = s.split()
                     room_name = " ".join(room_name)
-                    room_id = generate_id()
-                    room.actions[direction] = GoToRoomAction(room_id=room_id)
-                    self.rooms[room_id] = Room(name=room_name, desc="", actions={})
-                    self.state.rooms = self.rooms
+                    self.state.make_room(direction=direction, room_name=room_name)
+
                 case s if s.startswith("makeroomc "):
                     command, todirection, fromdirection, *room_name = s.split()
                     room_name = " ".join(room_name)
@@ -96,7 +96,9 @@ class Game:
                         name=room_name,
                         desc="",
                         actions={
-                            fromdirection: GoToRoomAction(room_id=self.campaign.room_id)
+                            fromdirection: GoToRoomAction(
+                                room_id=self.state.campaign.room_id
+                            )
                         },
                     )
                     self.state.rooms = self.rooms
@@ -149,26 +151,12 @@ class Game:
 
     def get_actions(self):
         actions = []
-        roomid = self.campaign.room_id
+        roomid = self.state.campaign.room_id
         room = self.rooms[roomid]
         for key, value in room.actions.items():
             room_name = self.get_room_name(value)
             actions.append(f"{key} - {room_name}")
         return actions
-
-    def choose_campaign(self):
-        campaigns = self.state.campaigns or []
-        options = ["New Game"]
-        for campaign in campaigns:
-            options.append(campaign.name)
-        option = get_choice("Choose your campaign: ", options, True)
-        if option == NEW_GAME:
-            campaign = Campaign(name="Campaign " + str(option + len(options)))
-            campaigns.append(campaign)
-            self.state.campaigns = campaigns
-            self.save_state()
-            return campaign
-        return campaigns[option - 1]
 
     def pick_stats(self, character: Character):
         # When using self here does it mean the names in characters is the instance

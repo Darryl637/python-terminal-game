@@ -12,7 +12,7 @@
         }
       ],
       "name": "Campaign 1",
-      "room_id": "2b879932-2814-4129-a2b5-5c02283583ab",
+      "room_id": "2512b176-4db6-4931-8549-c2266c9a5378",
       "character_count": 1
     },
     {
@@ -44,6 +44,44 @@
       "name": "Campaign 3",
       "room_id": "vnum0",
       "character_count": 1
+    },
+    {
+      "characters": [
+        {
+          "name": "timmy",
+          "Strength": 15,
+          "Dexterity": 15,
+          "Wisdom": 15,
+          "Intelligence": 15,
+          "Constitution": 15
+        }
+      ],
+      "name": "Campaign 4",
+      "room_id": "vnum0",
+      "character_count": 1
+    },
+    {
+      "characters": [
+        {
+          "name": "tim",
+          "Strength": 15,
+          "Dexterity": 15,
+          "Wisdom": 15,
+          "Intelligence": 15,
+          "Constitution": 15
+        },
+        {
+          "name": "john",
+          "Strength": 12,
+          "Dexterity": 12,
+          "Wisdom": 12,
+          "Intelligence": 12,
+          "Constitution": 27
+        }
+      ],
+      "name": "Campaign 5",
+      "room_id": "2b879932-2814-4129-a2b5-5c02283583ab",
+      "character_count": 2
     }
   ],
   "rooms": {
@@ -64,7 +102,7 @@
     },
     "2b879932-2814-4129-a2b5-5c02283583ab": {
       "name": "Basic Commands",
-      "desc": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla mattis magna ac\nmassa fermentum, eu dapibus augue facilisis. Nam tempus vestibulum velit, eget\nlobortis lorem blandit ut. Integer porta magna vel diam efficitur pretium. Proin\nquis diam quis erat posuere semper in vel tellus. Proin et tellus laoreet,\nlaoreet ipsum eget, sodales felis. Nunc turpis metus, sodales ut vestibulum nec,\ncondimentum ac sem. Sed et facilisis sem. Aliquam erat volutpat. Cras vitae nisl\nlobortis, suscipit metus a, posuere orci. Phasellus ultricies sollicitudin felis\nvitae feugiat. Quisque faucibus laoreet lacus, commodo facilisis orci eleifend\nid. Aliquam sed porttitor tortor.\n\n\nLorem ipsum dolor sit amet, consectetur\nadipiscing elit. Nulla mattis magna ac massa fermentum, eu dapibus augue\nfacilisis. Nam tempus vestibulum velit, eget lobortis lorem blandit ut. Integer\nporta magna vel diam efficitur pretium. Proin quis diam quis erat posuere semper\nin vel tellus. Proin et tellus laoreet, laoreet ipsum eget, sodales felis. Nunc\nturpis metus, sodales ut vestibulum nec, condimentum ac sem. Sed et facilisis\nsem. Aliquam erat volutpat. Cras vitae nisl lobortis, suscipit metus a, posuere\norci. Phasellus ultricies sollicitudin felis vitae feugiat. Quisque faucibus\nlaoreet lacus, commodo facilisis orci eleifend id. Aliquam sed porttitor tortor.",
+      "desc": "test\n\ntest",
       "actions": {
         "south": {
           "action": "gotoroom",
@@ -83,8 +121,23 @@
         "east": {
           "action": "gotoroom",
           "room_id": "2b879932-2814-4129-a2b5-5c02283583ab"
+        },
+        "west": {
+          "action": "gotoroom",
+          "room_id": "89638c8f-45fb-46d6-9c7e-b1e842e0a1a0"
+        }
+      }
+    },
+    "89638c8f-45fb-46d6-9c7e-b1e842e0a1a0": {
+      "name": "small storage room",
+      "desc": "",
+      "actions": {
+        "east": {
+          "action": "gotoroom",
+          "room_id": "2512b176-4db6-4931-8549-c2266c9a5378"
         }
       }
     }
-  }
+  },
+  "campaign_index": 4
 }
