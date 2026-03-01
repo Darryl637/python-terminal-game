@@ -1,8 +1,8 @@
 from pydantic import BaseModel
 from typing import List, Literal
-from utility import generate_id
-from constants import NEW_GAME
-from utility import get_choice
+from src.utility import generate_id
+from src.constants import NEW_GAME
+from src.utility import get_choice
 
 
 class Character(BaseModel):

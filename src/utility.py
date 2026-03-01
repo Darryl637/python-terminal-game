@@ -28,8 +28,12 @@ def get_number(prompt: str, validator: Callable[[int], bool] = is_valid) -> int:
             number = int(input())
             if validator(number):
                 return number
-        finally:
-            print("Try again")
+        except KeyboardInterrupt:
+            exit(0)
+            return
+        except ValueError:
+            pass
+        print("Try again")
 
 
 def set_state_with_line(instance: Any, path: str, prompt: str, skip_if_has_value=False):

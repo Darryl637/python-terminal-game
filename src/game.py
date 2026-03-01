@@ -1,10 +1,10 @@
 from colorama import Fore, Style, init, Back
-from models import ROOMS
+from src.models import ROOMS
 import os
 import textwrap
-from models import State, Character, Room, GoToRoomAction, Campaign
-from constants import NEW_GAME, STATS
-from utility import (
+from src.models import State, Character, Room, GoToRoomAction, Campaign
+from src.constants import NEW_GAME, STATS
+from src.utility import (
     generate_id,
     get_choice,
     get_index,

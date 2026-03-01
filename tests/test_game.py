@@ -1,4 +1,4 @@
-from utility import (
+from src.utility import (
     get_index,
     get_number,
     set_state_with_line,
@@ -66,6 +66,13 @@ def test__get_number__validates_number():
 
         output = get_number(prompt, validator)
         assert output == 5
+
+
+@mock.patch("builtins.input", side_effect=KeyboardInterrupt())
+@mock.patch("builtins.exit")
+def test__get_number__exits_program(mock_exit, mock_input):
+    get_number("exit prompt")
+    mock_exit.assert_called_once_with(0)
 
 
 def test__set_state_with_line__it_skips():
