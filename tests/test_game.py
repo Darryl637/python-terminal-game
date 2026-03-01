@@ -75,27 +75,26 @@ def test__get_number__exits_program(mock_exit, mock_input):
     mock_exit.assert_called_once_with(0)
 
 
-def test__set_state_with_line__it_skips():
-    path = "zaboomafom"
-    map = {
-        path: 4,
-    }
-    prompt = "testingwords"
-    skip_if_has_value = True
-    set_state_with_line(map, path, prompt, skip_if_has_value)
+class Dummy:
+    def __init__(self):
+        self.zaboomafom = 4
+
+
+def test__set_state_with_line__has_value_skip():
+    d = Dummy()
+    set_state_with_line(d, "zaboomafom", "testwords", skip_if_has_value=True)
+    assert d.zaboomafom == 4
 
 
 def test__set_state_with_line__stores_line():
     user_input = "stringtopass"
     path = "zaboomafom"
-    map = {
-        path: 4,
-    }
+    d = Dummy()
     with mock.patch("builtins.input", side_effect=[user_input]):
         prompt = "testingwords"
         skip_if_has_value = False
-        set_state_with_line(map, path, prompt, skip_if_has_value)
-        assert map[path] == user_input
+        set_state_with_line(d, path, prompt, skip_if_has_value)
+        assert d.zaboomafom == user_input
 
 
 def test__set_state_with_number__it_skips():
