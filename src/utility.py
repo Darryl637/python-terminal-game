@@ -70,6 +70,7 @@ def set_state_with_choice(
 
 
 def get_line(prompt: str):
+
     return input(prompt + "\n")
 
 

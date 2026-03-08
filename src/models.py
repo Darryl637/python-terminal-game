@@ -1,8 +1,9 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Literal
 from src.utility import generate_id
 from src.constants import NEW_GAME
 from src.utility import get_choice
+from src.items import Wearable, Armor, Weapon, Layers
 
 
 class Character(BaseModel):
@@ -12,6 +13,10 @@ class Character(BaseModel):
     Wisdom: int = 0
     Intelligence: int = 0
     Constitution: int = 0
+    head: List[
+        Layers
+    ] = []  # This represents items being worn by each head 1+ head locations
+    body: Layers = Layers()
 
 
 class Campaign(BaseModel):
@@ -19,6 +24,7 @@ class Campaign(BaseModel):
     name: str = ""
     room_id: str = ""
     character_count: int = 0
+    inventory: List[str] = []
 
 
 class State(BaseModel):
@@ -59,6 +65,7 @@ class Room(BaseModel):
     name: str = ""
     desc: str = ""
     actions: dict[str, "Action"] = {}
+    items: List[str] = []
 
 
 class GoToRoomAction(BaseModel):

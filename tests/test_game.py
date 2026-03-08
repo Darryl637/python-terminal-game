@@ -98,13 +98,14 @@ def test__set_state_with_line__stores_line():
 
 
 def test__set_state_with_number__it_skips():
+    d = Dummy()
     path = "zaboomafom"
-    map = {
-        path: 4,
-    }
     prompt = "testingwords"
     skip_if_has_value = True
-    set_state_with_number(map, path, prompt, is_valid, skip_if_has_value)
+    with mock.patch("src.utility.get_number") as mock_get_number:
+        set_state_with_number(d, path, prompt, is_valid, skip_if_has_value)
+        mock_get_number.assert_not_called()
+    assert d.zaboomafom == 4
 
 
 def test__set_state_with_number__stores_number():

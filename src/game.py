@@ -1,4 +1,5 @@
 from colorama import Fore, Style, init, Back
+from typing import List
 from src.models import ROOMS
 import os
 import textwrap
@@ -12,6 +13,7 @@ from src.utility import (
     set_state_with_line,
     set_state_with_number,
     validate_campaign_player_count,
+    get_line,
 )
 
 
@@ -50,37 +52,31 @@ class Game:
             if i >= len(characters):
                 characters.append(character)
             self.pick_stats(character)
-
+        needsprompt = True
         while True:
             room_id = self.state.campaign.room_id
             room = self.rooms[room_id]
             actions = self.get_actions()
-            print(
-                f"({room.name}) \n--------------------------------------------------------------------------------{Fore.RESET} "
-            )
-            print(
-                f"{room.desc} \n--------------------------------------------------------------------------------"
-            )
+            if needsprompt:
+                os.system("cls")
+                print(
+                    f"({room.name}) \n--------------------------------------------------------------------------------{Fore.RESET} "
+                )
+                print(
+                    f"{room.desc} \n--------------------------------------------------------------------------------"
+                )
 
-            action = get_choice(
-                "Obvious exits:             ",
-                [*actions],
-                allows_free_form=True,
-                returns_index=True,
-            )
-            os.system("cls")
+                print("Obvious exits: \n" + "\n".join(actions))
+                print(
+                    "--------------------------------------------------------------------------------"
+                )
+            needsprompt = True
+
+            action = get_line(">")
+
             match action:
-                case i if isinstance(i, int):
-                    direction = list(room.actions.keys())[
-                        action
-                    ]  # direction stores string north west east ext
-                    match room.actions[direction]:
-                        case a if isinstance(a, GoToRoomAction):
-                            room_id = a.room_id
-
-                            self.state.campaign.room_id = room_id
-                        case _:
-                            pass
+                case "look":
+                    needsprompt = True
                 case s if s.startswith("makeroom "):
                     command, direction, *room_name = s.split()
                     room_name = " ".join(room_name)
@@ -91,7 +87,6 @@ class Game:
                     room_name = " ".join(room_name)
                     room_id = generate_id()
                     room.actions[todirection] = GoToRoomAction(room_id=room_id)
-
                     self.rooms[room_id] = Room(
                         name=room_name,
                         desc="",
@@ -102,6 +97,44 @@ class Game:
                         },
                     )
                     self.state.rooms = self.rooms
+
+                case "makeitem":
+                    print(
+                        "Enter name, item_id, value, wear_location, damage_roll, hitroll"
+                    )
+
+                case "i" | "inv" | "inventory":
+                    print("Inventory:")
+                    items = self.state.campaign.inventory
+                    for item in items:
+                        print(item)
+                    needsprompt = False
+                case g if g.startswith("get "):
+                    command, *item_input = g.split()
+                    item_input = " ".join(item_input).lower()
+                    found = False
+                    for index, item in enumerate(room.items):
+                        if item_input == item:
+                            self.state.campaign.inventory.append(item)
+                            room.items.pop(index)
+                            found = True
+                            break
+                    if not found:
+                        print("That item isn't here")
+
+                case d if d.startswith("drop "):
+                    command, *item_input = d.split()
+                    item_input = " ".join(item_input).lower()
+                    found = False
+                    for index, item in enumerate(self.state.campaign.inventory):
+                        if item_input == item:
+                            room.items.append(item)
+                            self.state.campaign.inventory.pop(index)
+                            found = True
+                            break
+                    if not found:
+                        print("You don't have that item")
+
                 case s if s.startswith("setroomname "):
                     command, *room_name = s.split()
                     room_name = " ".join(room_name)
@@ -129,7 +162,7 @@ class Game:
                             break_on_hyphens=False,
                         )
                 case d if d.startswith("deleteroom "):
-                    command, toremove = s.split()
+                    command, toremove = d.split()
                     del self.rooms[toremove]
                     for room in self.rooms.values():
                         for action_key, action_value in dict(room.actions).items():
@@ -147,9 +180,18 @@ class Game:
                 case q if q.startswith("quit"):
                     break
 
+                case direction if direction in room.actions:
+                    match room.actions[direction]:
+                        case a if isinstance(a, GoToRoomAction):
+                            room_id = a.room_id
+
+                            self.state.campaign.room_id = room_id
+                        case _:
+                            pass
+
             self.save_state()
 
-    def get_actions(self):
+    def get_actions(self) -> List[str]:
         actions = []
         roomid = self.state.campaign.room_id
         room = self.rooms[roomid]
