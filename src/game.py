@@ -15,6 +15,7 @@ from src.utility import (
     validate_campaign_player_count,
     get_line,
 )
+from src.items import wear_location, layer_location, ItemBase, Armor, Wearable
 
 
 class Game:
@@ -70,6 +71,9 @@ class Game:
                 print(
                     "--------------------------------------------------------------------------------"
                 )
+
+                for item in room.items:
+                    print(item)
             needsprompt = True
 
             action = get_line(">")
@@ -99,10 +103,34 @@ class Game:
                     self.state.rooms = self.rooms
 
                 case "makeitem":
+                    item_id = generate_id()
+                    item = Armor()
+                    self.state.items[item_id] = item
+
+                    item_id = generate_id()
+                    item = ItemBase()
+                    self.state.items[item_id] = item
+
+                    item_id = generate_id()
+                    item = Wearable()
+                    self.state.items[item_id] = item
+
                     print(
                         "Enter name, item_id, value, wear_location, damage_roll, hitroll"
                     )
+                case "eq" | "equipment":
+                    for character in characters:
+                        print(f"Name: {character.name}")
+                        print("(EQUIPMENT:)\n")
+                        for location in wear_location:
+                            layers = getattr(character, location)
+                            if layers:
+                                print(f"{location}:")
+                                for layer in layers:
+                                    print(layer)
+                                print()
 
+                    needsprompt = False
                 case "i" | "inv" | "inventory":
                     print("Inventory:")
                     items = self.state.campaign.inventory
@@ -131,6 +159,7 @@ class Game:
                             room.items.append(item)
                             self.state.campaign.inventory.pop(index)
                             found = True
+                            needsprompt = False
                             break
                     if not found:
                         print("You don't have that item")
@@ -174,9 +203,14 @@ class Game:
                         output = []
                         for stat in STATS:
                             output.append(f"{stat[0:3]}: {getattr(character, stat)}")
+                        print()
 
                         print(", ".join(output))
-                        print()
+                        print(
+                            f"hitroll: {character.hitroll}     damroll: {character.damroll}     armor: {character.armor}"
+                        )
+
+                    needsprompt = False
                 case q if q.startswith("quit"):
                     break
 

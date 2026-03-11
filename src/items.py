@@ -3,26 +3,27 @@ from typing import Literal
 
 
 class ItemBase(BaseModel):
-    name: str
-    item_id: str
-    value: int
+    name: str = ""
+    value: int = 0
 
 
 WearLocation = Literal["head", "torso", "waist", "legs", "hands", "feet", "arms"]
+wear_location = ["head", "torso", "waist", "legs", "hands", "feet", "arms"]
 
 
 class Wearable(ItemBase):
-    wear_location: WearLocation
-    damageroll: int
-    hitroll: int
+    wear_location: WearLocation = "torso"
+    damageroll: int = 1
+    hitroll: int = 1
 
 
 LayerLocation = Literal["first", "second", "third", "forth", "fifth"]
+layer_location = ["first", "second", "third", "forth", "fifth"]
 
 
 class Armor(Wearable):
-    armor: int
-    layer_loc: LayerLocation
+    armor: int = 0
+    layer_loc: LayerLocation = "first"
 
 
 class Weapon(Wearable):
@@ -31,6 +32,7 @@ class Weapon(Wearable):
 
 class Layer(BaseModel):
     item_id: str
+    # durability instance
 
 
 class Layers(BaseModel):

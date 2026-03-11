@@ -1,9 +1,9 @@
 from pydantic import BaseModel, Field
-from typing import List, Literal
+from typing import List, Literal, Union
 from src.utility import generate_id
 from src.constants import NEW_GAME
 from src.utility import get_choice
-from src.items import Wearable, Armor, Weapon, Layers
+from src.items import Wearable, Armor, Weapon, Layers, ItemBase
 
 
 class Character(BaseModel):
@@ -13,10 +13,19 @@ class Character(BaseModel):
     Wisdom: int = 0
     Intelligence: int = 0
     Constitution: int = 0
+    hitroll: int = 0
+    damroll: int = 0
+    armor: int = 0
     head: List[
         Layers
     ] = []  # This represents items being worn by each head 1+ head locations
-    body: Layers = Layers()
+
+    torso: List[Layers] = []
+    waist: List[Layers] = []
+    legs: List[Layers] = []
+    hands: List[Layers] = []
+    feet: List[Layers] = []
+    arms: List[Layers] = []
 
 
 class Campaign(BaseModel):
@@ -27,12 +36,16 @@ class Campaign(BaseModel):
     inventory: List[str] = []
 
 
+Item = Union[Armor, Weapon]
+
+
 class State(BaseModel):
     campaigns: List[Campaign] = []
     rooms: dict[
         str, "Room"
     ] = {}  # "Room" the quotes are saying to wait until file is loaded
     campaign_index: int = -1
+    items: dict[str, Item] = {}
 
     @property
     def campaign(self):
