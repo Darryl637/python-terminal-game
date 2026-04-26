@@ -3,7 +3,19 @@ from typing import List
 from src.models import ROOMS
 import os
 import textwrap
-from src.models import State, Character, Room, GoToRoomAction, Campaign
+from src.models import (
+    State,
+    Character,
+    Room,
+    GoToRoomAction,
+    Campaign,
+    wear_location,
+    layer_location,
+    ItemBase,
+    Armor,
+    Weapon,
+    HeldItem,
+)
 from src.constants import NEW_GAME, STATS
 from src.utility import (
     generate_id,
@@ -15,7 +27,6 @@ from src.utility import (
     validate_campaign_player_count,
     get_line,
 )
-from src.items import wear_location, layer_location, ItemBase, Armor, Wearable
 
 
 class Game:
@@ -26,7 +37,7 @@ class Game:
 
     def get_room_name(self, action: dict) -> str:
 
-        rooms = self.rooms
+        rooms = self.state.rooms
 
         if isinstance(action, GoToRoomAction):
             room_id = action.room_id
@@ -35,7 +46,6 @@ class Game:
 
     # make rooms save to json upon making room
     def start(self):
-        self.rooms = self.state.rooms or ROOMS
         self.state.choose_campaign()  # -> magic -> function
         self.save_state()
         set_state_with_number(
@@ -56,10 +66,10 @@ class Game:
         needsprompt = True
         while True:
             room_id = self.state.campaign.room_id
-            room = self.rooms[room_id]
+            room = self.state.rooms[room_id]
             actions = self.get_actions()
             if needsprompt:
-                os.system("cls")
+                #            os.system("cls")
                 print(
                     f"({room.name}) \n--------------------------------------------------------------------------------{Fore.RESET} "
                 )
@@ -89,35 +99,21 @@ class Game:
                 case s if s.startswith("makeroomc "):
                     command, todirection, fromdirection, *room_name = s.split()
                     room_name = " ".join(room_name)
-                    room_id = generate_id()
-                    room.actions[todirection] = GoToRoomAction(room_id=room_id)
-                    self.rooms[room_id] = Room(
-                        name=room_name,
-                        desc="",
-                        actions={
-                            fromdirection: GoToRoomAction(
-                                room_id=self.state.campaign.room_id
-                            )
-                        },
-                    )
-                    self.state.rooms = self.rooms
+                    self.state.make_roomc(room_name, todirection, fromdirection)
 
-                case "makeitem":
+                case s if s.startswith("make "):
+                    command, type = s.lower().split()
+                    match type:
+                        case "armor":
+                            item = Armor()
+
+                        case "weapon":
+                            item = Weapon()
+
+                    item.fill()
                     item_id = generate_id()
-                    item = Armor()
                     self.state.items[item_id] = item
 
-                    item_id = generate_id()
-                    item = ItemBase()
-                    self.state.items[item_id] = item
-
-                    item_id = generate_id()
-                    item = Wearable()
-                    self.state.items[item_id] = item
-
-                    print(
-                        "Enter name, item_id, value, wear_location, damage_roll, hitroll"
-                    )
                 case "eq" | "equipment":
                     for character in characters:
                         print(f"Name: {character.name}")
@@ -192,11 +188,32 @@ class Game:
                         )
                 case d if d.startswith("deleteroom "):
                     command, toremove = d.split()
-                    del self.rooms[toremove]
-                    for room in self.rooms.values():
+                    del self.state.rooms[toremove]
+                    for room in self.state.rooms.values():
                         for action_key, action_value in dict(room.actions).items():
                             if action_value.room_id == toremove:
                                 del room.actions[action_key]
+                case s if s.startswith("spawn "):
+                    command, search = s.split()
+                    items = [
+                        (key, item)
+                        for (key, item) in self.state.items.items()
+                        if search.lower() in item.name.lower()
+                    ]
+                    item_names = [item.name for (key, item) in items]
+                    print(list(item_names))
+                    choice = get_choice(
+                        "Which item do you want to spawn?",
+                        [*item_names, "Nevermind"],
+                        returns_index=True,
+                    )
+                    if choice < len(items):
+                        (item_id, item) = items[choice]
+                        held_item = HeldItem()
+                        held_item.item_id = item_id
+                        held_item.durability = item.durability
+                        room.items.append(held_item)
+
                 case s if s.startswith("score"):
                     for character in characters:
                         print(f"-= Score for {character.name} =-")
@@ -214,21 +231,16 @@ class Game:
                 case q if q.startswith("quit"):
                     break
 
-                case direction if direction in room.actions:
-                    match room.actions[direction]:
-                        case a if isinstance(a, GoToRoomAction):
-                            room_id = a.room_id
-
-                            self.state.campaign.room_id = room_id
-                        case _:
-                            pass
+                case _:
+                    if not self.state.go_direction(action):
+                        print("you can't go that way")
 
             self.save_state()
 
     def get_actions(self) -> List[str]:
         actions = []
         roomid = self.state.campaign.room_id
-        room = self.rooms[roomid]
+        room = self.state.rooms[roomid]
         for key, value in room.actions.items():
             room_name = self.get_room_name(value)
             actions.append(f"{key} - {room_name}")
@@ -270,5 +282,5 @@ class Game:
             with open("state.json", "r") as f:
                 contents = f.read()
                 self.state = State.model_validate_json(contents)
-        except:
+        except FileNotFoundError:
             self.state = State()

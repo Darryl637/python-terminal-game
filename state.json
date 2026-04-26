@@ -3,7 +3,7 @@
     {
       "characters": [
         {
-          "name": "testchar",
+          "name": "1",
           "Strength": 15,
           "Dexterity": 15,
           "Wisdom": 15,
@@ -22,275 +22,35 @@
         }
       ],
       "name": "Campaign 1",
-      "room_id": "bab53b7f-3224-4d8d-b64d-b9e7269e89eb",
-      "character_count": 1,
-      "inventory": []
-    },
-    {
-      "characters": [
-        {
-          "name": "bobby",
-          "Strength": 15,
-          "Dexterity": 15,
-          "Wisdom": 15,
-          "Intelligence": 15,
-          "Constitution": 15,
-          "hitroll": 0,
-          "damroll": 0,
-          "armor": 0,
-          "head": [],
-          "torso": [],
-          "waist": [],
-          "legs": [],
-          "hands": [],
-          "feet": [],
-          "arms": []
-        }
-      ],
-      "name": "Campaign 2",
-      "room_id": "2b879932-2814-4129-a2b5-5c02283583ab",
-      "character_count": 1,
-      "inventory": []
-    },
-    {
-      "characters": [
-        {
-          "name": "tommy",
-          "Strength": 15,
-          "Dexterity": 15,
-          "Wisdom": 15,
-          "Intelligence": 15,
-          "Constitution": 15,
-          "hitroll": 0,
-          "damroll": 0,
-          "armor": 0,
-          "head": [],
-          "torso": [],
-          "waist": [],
-          "legs": [],
-          "hands": [],
-          "feet": [],
-          "arms": []
-        }
-      ],
-      "name": "Campaign 3",
       "room_id": "vnum0",
       "character_count": 1,
-      "inventory": []
-    },
-    {
-      "characters": [
-        {
-          "name": "timmy",
-          "Strength": 15,
-          "Dexterity": 15,
-          "Wisdom": 15,
-          "Intelligence": 15,
-          "Constitution": 15,
-          "hitroll": 0,
-          "damroll": 0,
-          "armor": 0,
-          "head": [],
-          "torso": [],
-          "waist": [],
-          "legs": [],
-          "hands": [],
-          "feet": [],
-          "arms": []
-        }
-      ],
-      "name": "Campaign 4",
-      "room_id": "vnum0",
-      "character_count": 1,
-      "inventory": []
-    },
-    {
-      "characters": [
-        {
-          "name": "tim",
-          "Strength": 15,
-          "Dexterity": 15,
-          "Wisdom": 15,
-          "Intelligence": 15,
-          "Constitution": 15,
-          "hitroll": 0,
-          "damroll": 0,
-          "armor": 0,
-          "head": [],
-          "torso": [],
-          "waist": [],
-          "legs": [],
-          "hands": [],
-          "feet": [],
-          "arms": []
-        },
-        {
-          "name": "john",
-          "Strength": 12,
-          "Dexterity": 12,
-          "Wisdom": 12,
-          "Intelligence": 12,
-          "Constitution": 27,
-          "hitroll": 0,
-          "damroll": 0,
-          "armor": 0,
-          "head": [],
-          "torso": [],
-          "waist": [],
-          "legs": [],
-          "hands": [],
-          "feet": [],
-          "arms": []
-        }
-      ],
-      "name": "Campaign 5",
-      "room_id": "2b879932-2814-4129-a2b5-5c02283583ab",
-      "character_count": 2,
       "inventory": []
     }
   ],
   "rooms": {
     "vnum0": {
-      "name": "Academy Entrance",
-      "desc": "You step into the gleaming entrance hall of the academy. Polished durasteel\nfloors reflect the glow of overhead lights, and banners of past graduates hang\nproudly along the walls. A hovering droid floats nearby, scanning newcomers with\nquiet beeps.\n\n(Type the direction you would like to move then hit enter:)",
+      "name": "Cloning tube",
+      "desc": "You are in a cloning tube\n",
       "actions": {
         "north": {
           "action": "gotoroom",
-          "room_id": "2b879932-2814-4129-a2b5-5c02283583ab"
+          "room_id": "f51e3c55-82db-4ed4-bcf5-4332c3b7df6d"
         }
       },
       "items": []
     },
-    "1875378e-06eb-4e09-8b64-756787030532": {
+    "f51e3c55-82db-4ed4-bcf5-4332c3b7df6d": {
       "name": "hallway",
       "desc": "",
-      "actions": {},
-      "items": []
-    },
-    "2b879932-2814-4129-a2b5-5c02283583ab": {
-      "name": "Corridor",
-      "desc": "This large open corridor has instruction rooms to the east and west. The\ncorridor extends into the distance to the north.",
       "actions": {
         "south": {
           "action": "gotoroom",
           "room_id": "vnum0"
-        },
-        "west": {
-          "action": "gotoroom",
-          "room_id": "2512b176-4db6-4931-8549-c2266c9a5378"
-        },
-        "east": {
-          "action": "gotoroom",
-          "room_id": "bab53b7f-3224-4d8d-b64d-b9e7269e89eb"
-        },
-        "north": {
-          "action": "gotoroom",
-          "room_id": "1599a3c1-5c85-4ff6-ae2f-66d637629444"
-        }
-      },
-      "items": []
-    },
-    "2512b176-4db6-4931-8549-c2266c9a5378": {
-      "name": "Equipment Training",
-      "desc": "this line  this line",
-      "actions": {
-        "east": {
-          "action": "gotoroom",
-          "room_id": "2b879932-2814-4129-a2b5-5c02283583ab"
-        },
-        "west": {
-          "action": "gotoroom",
-          "room_id": "89638c8f-45fb-46d6-9c7e-b1e842e0a1a0"
-        }
-      },
-      "items": []
-    },
-    "89638c8f-45fb-46d6-9c7e-b1e842e0a1a0": {
-      "name": "small storage room",
-      "desc": "",
-      "actions": {
-        "east": {
-          "action": "gotoroom",
-          "room_id": "2512b176-4db6-4931-8549-c2266c9a5378"
-        }
-      },
-      "items": []
-    },
-    "bab53b7f-3224-4d8d-b64d-b9e7269e89eb": {
-      "name": "Items training",
-      "desc": "There are serveral ways to interact with items. Lets try some basic commands.\nuse \"inventory\" to see campaigns current inventory.",
-      "actions": {
-        "west": {
-          "action": "gotoroom",
-          "room_id": "2b879932-2814-4129-a2b5-5c02283583ab"
-        }
-      },
-      "items": [
-        "dog",
-        "cat",
-        "puppy"
-      ]
-    },
-    "1599a3c1-5c85-4ff6-ae2f-66d637629444": {
-      "name": "Shuttle Landing",
-      "desc": "whatever i want it to say",
-      "actions": {
-        "south": {
-          "action": "gotoroom",
-          "room_id": "2b879932-2814-4129-a2b5-5c02283583ab"
         }
       },
       "items": []
     }
   },
   "campaign_index": 0,
-  "items": {
-    "ba85dc80-01cb-4b06-a284-f8f62a75bc4d": {
-      "name": "",
-      "value": 0,
-      "wear_location": "torso",
-      "damageroll": 1,
-      "hitroll": 1,
-      "armor": 0,
-      "layer_loc": "first"
-    },
-    "0d0cbe92-5836-4d4e-a7a4-daa3f51368e6": {
-      "name": "",
-      "value": 0,
-      "wear_location": "torso",
-      "damageroll": 1,
-      "hitroll": 1,
-      "armor": 0,
-      "layer_loc": "first"
-    },
-    "c491e67c-4474-49af-aa20-68090d46db8a": {
-      "name": "",
-      "value": 0,
-      "wear_location": "torso",
-      "damageroll": 1,
-      "hitroll": 1,
-      "armor": 0,
-      "layer_loc": "first"
-    },
-    "9680da70-31c0-4146-85e4-a9990a83289e": {
-      "name": "",
-      "value": 0,
-      "wear_location": "torso",
-      "damageroll": 1,
-      "hitroll": 1,
-      "armor": 0,
-      "layer_loc": "first"
-    },
-    "3e9d8cbd-d20a-4770-a7e6-d8382b5f3e24": {
-      "name": "",
-      "value": 0
-    },
-    "c8265c83-3df2-4a27-b5db-63e7c0b79cdd": {
-      "name": "",
-      "value": 0,
-      "wear_location": "torso",
-      "damageroll": 1,
-      "hitroll": 1
-    }
-  }
+  "items": {}
 }

@@ -21,6 +21,14 @@ def is_valid(*args):
     return True
 
 
+def is_non_negative(number: int):
+    return number >= 0
+
+
+def is_positive(number: int):
+    return number > 0
+
+
 def get_number(prompt: str, validator: Callable[[int], bool] = is_valid) -> int:
     while True:
         print(prompt)
@@ -58,15 +66,16 @@ def set_state_with_number(
 
 # possible not needed now
 def set_state_with_choice(
-    map: dict[str, Any],
+    instance: Any,
     path: str,
     prompt: str,
     options: List[str],
     skip_if_has_value=False,
 ):
-    if skip_if_has_value and path in map:
+    value = getattr(instance, path)
+    if skip_if_has_value and value:
         return
-    map[path] = get_choice(prompt, options)
+    setattr(instance, path, get_choice(prompt, options))
 
 
 def get_line(prompt: str):

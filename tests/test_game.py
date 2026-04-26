@@ -7,8 +7,24 @@ from src.utility import (
     generate_id,
     validate_campaign_player_count,
 )
+from src.models import State, CLONING_TUBE_ID, Room, GoToRoomAction, Campaign
 from unittest import mock
 import pytest
+
+TEST_DIRECTION = "north"
+
+
+@pytest.fixture
+def dummy_state():
+    state = State()
+
+    state.rooms[CLONING_TUBE_ID] = Room(
+        name="Cloning tube",
+        desc="You are in a cloning tube\n",
+        actions={TEST_DIRECTION: GoToRoomAction(room_id="string")},
+    )
+    state.campaigns.append(Campaign(room_id=CLONING_TUBE_ID))
+    return state
 
 
 def test_generate_id():
@@ -111,11 +127,33 @@ def test__set_state_with_number__it_skips():
 def test__set_state_with_number__stores_number():
     user_input = "3"
     path = "zaboomafom"
-    map = {
-        path: 4,
-    }
+    d = Dummy()
+    path = "zaboomafom"
+
     with mock.patch("builtins.input", side_effect=[user_input]):
         prompt = "testingwords"
         skip_if_has_value = False
-        set_state_with_number(map, path, prompt, is_valid, skip_if_has_value)
-        assert map[path] == int(user_input)
+        set_state_with_number(d, path, prompt, is_valid, skip_if_has_value)
+        assert d.zaboomafom == int(user_input)
+
+
+def test__go_direction__has_room__it_can_go(dummy_state):
+
+    assert dummy_state.go_direction(TEST_DIRECTION)
+
+
+def test__go_direction__does_not_have_room__it_cant_go(dummy_state):
+    assert not dummy_state.go_direction("south")
+
+
+def test__make_roomc__add_a_room__it_works(dummy_state):
+    room_name = "testroom"
+    to_direction = "up"
+    from_direction = "down"
+    dummy_state.make_roomc(room_name, to_direction, from_direction)
+    action = dummy_state.room.actions[to_direction]
+    assert isinstance(action, GoToRoomAction)
+    other_room = dummy_state.rooms[action.room_id]
+    other_action = other_room.actions[from_direction]
+    assert isinstance(other_action, GoToRoomAction)
+    assert other_action.room_id == dummy_state.campaign.room_id
