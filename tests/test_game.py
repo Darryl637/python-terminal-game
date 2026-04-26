@@ -156,4 +156,6 @@ def test__make_roomc__add_a_room__it_works(dummy_state):
     other_room = dummy_state.rooms[action.room_id]
     other_action = other_room.actions[from_direction]
     assert isinstance(other_action, GoToRoomAction)
-    assert other_action.room_id == dummy_state.campaign.room_id
+    assert (
+        other_action.room_id == dummy_state.campaign.room_id
+    )  # this checks to make sure new room connects to current room
