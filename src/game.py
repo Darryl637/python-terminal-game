@@ -1,6 +1,6 @@
 from colorama import Fore, Style, init, Back
 from typing import List
-from src.models import ROOMS
+from src.models import ROOMS, Action
 import os
 import textwrap
 from src.models import (
@@ -35,7 +35,7 @@ class Game:
     def __init__(self):
         self.load_state()
 
-    def get_room_name(self, action: dict) -> str:
+    def get_room_name(self, action: Action) -> str:
 
         rooms = self.state.rooms
 
@@ -91,12 +91,8 @@ class Game:
             match action:
                 case "look":
                     needsprompt = True
-                case s if s.startswith("makeroom "):
-                    command, direction, *room_name = s.split()
-                    room_name = " ".join(room_name)
-                    self.state.make_room(direction=direction, room_name=room_name)
 
-                case s if s.startswith("makeroomc "):
+                case s if s.startswith("makeroom "):
                     command, todirection, fromdirection, *room_name = s.split()
                     room_name = " ".join(room_name)
                     self.state.make_roomc(room_name, todirection, fromdirection)
@@ -115,16 +111,7 @@ class Game:
                     self.state.items[item_id] = item
 
                 case "eq" | "equipment":
-                    for character in characters:
-                        print(f"Name: {character.name}")
-                        print("(EQUIPMENT:)\n")
-                        for location in wear_location:
-                            layers = getattr(character, location)
-                            if layers:
-                                print(f"{location}:")
-                                for layer in layers:
-                                    print(layer)
-                                print()
+                    print(self.state.show_equipment())
 
                     needsprompt = False
                 case "i" | "inv" | "inventory":
@@ -163,36 +150,47 @@ class Game:
                 case s if s.startswith("setroomname "):
                     command, *room_name = s.split()
                     room_name = " ".join(room_name)
-                    room.name = room_name
+                    self.state.set_room_name(room_name)
                 case id if id.startswith("vin "):
                     print(room_id)
                 case s if s.startswith("makeexit "):
                     command, direction, room_id = s.split()
                     room.actions[direction] = GoToRoomAction(room_id=room_id)
+
                 case d if d.startswith("roomdesc "):
                     print("Enter new room description")
                     print("Type CLOSE on new line to finalize description")
                     buffer = []
+
                     while True:
                         line = input()
                         if line.strip().upper() == "CLOSE":
                             break
-                        buffer.append(line)
-                        buffer_needs_format = "\n".join(line.strip() for line in buffer)
-                        room.desc = textwrap.fill(
-                            buffer_needs_format,
-                            replace_whitespace=False,
+                        buffer.append(line.rstrip())
+
+                    # Join exactly as typed
+                    raw_text = "\n".join(buffer)
+
+                    # Split into paragraphs (blank lines separate them)
+                    paragraphs = [p.strip() for p in raw_text.split("\n\n")]
+
+                    wrapped_paragraphs = [
+                        textwrap.fill(
+                            p,
                             width=80,
                             break_long_words=False,
                             break_on_hyphens=False,
                         )
+                        for p in paragraphs
+                        if p
+                    ]
+
+                    # Rejoin with a blank line between paragraphs
+                    room.desc = "\n\n".join(wrapped_paragraphs)
+
                 case d if d.startswith("deleteroom "):
-                    command, toremove = d.split()
-                    del self.state.rooms[toremove]
-                    for room in self.state.rooms.values():
-                        for action_key, action_value in dict(room.actions).items():
-                            if action_value.room_id == toremove:
-                                del room.actions[action_key]
+                    command, room_id = d.split()
+                    self.state.delete_room(room_id)
                 case s if s.startswith("spawn "):
                     command, search = s.split()
                     items = [
@@ -215,17 +213,7 @@ class Game:
                         room.items.append(held_item)
 
                 case s if s.startswith("score"):
-                    for character in characters:
-                        print(f"-= Score for {character.name} =-")
-                        output = []
-                        for stat in STATS:
-                            output.append(f"{stat[0:3]}: {getattr(character, stat)}")
-                        print()
-
-                        print(", ".join(output))
-                        print(
-                            f"hitroll: {character.hitroll}     damroll: {character.damroll}     armor: {character.armor}"
-                        )
+                    print(self.state.get_score())
 
                     needsprompt = False
                 case q if q.startswith("quit"):

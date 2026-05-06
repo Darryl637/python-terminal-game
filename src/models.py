@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import List, Literal, Union
-from src.constants import NEW_GAME
+from src.constants import NEW_GAME, STATS
 from src.utility import (
     set_state_with_line,
     set_state_with_number,
@@ -159,14 +159,43 @@ class State(BaseModel):
     def campaign(self):
         return self.campaigns[self.campaign_index]
 
+    @property
+    def characters(self):
+        return self.campaign.characters
+
+    def get_score(self):
+        output = []
+        for character in self.characters:
+            output.append(f"-= Score for {character.name} =-")
+            for stat in STATS:
+                output.append(f"{stat[0:3]}: {getattr(character, stat)}")
+            output.append("")
+
+            output.append(
+                f"hitroll: {character.hitroll}     damroll: {character.damroll}     armor: {character.armor}"
+            )
+        return "\n".join(output)
+
+    def delete_room(self, room_id: str):
+        del self.rooms[room_id]
+        for room in self.rooms.values():
+            for action_key, action_value in dict(room.actions).items():
+                if action_value.room_id == room_id:
+                    del room.actions[action_key]
+
+    def set_room_name(self, room_name: str):
+        self.room.name = room_name
+
     def make_roomc(self, room_name: str, todirection: str, fromdirection: str):
+        _, room = self.make_room(todirection, room_name)
+        room.actions[fromdirection] = GoToRoomAction(room_id=self.campaign.room_id)
+
+    def make_room(self, direction: str, room_name: str):
         room_id = generate_id()
-        self.room.actions[todirection] = GoToRoomAction(room_id=room_id)
-        self.rooms[room_id] = Room(
-            name=room_name,
-            desc="",
-            actions={fromdirection: GoToRoomAction(room_id=self.campaign.room_id)},
-        )
+        self.room.actions[direction] = GoToRoomAction(room_id=room_id)
+        room = Room(name=room_name, desc="", actions={})
+        self.rooms[room_id] = room
+        return room_id, room
 
     def go_direction(self, direction: str) -> bool:
         match self.room.actions.get(direction):
@@ -176,12 +205,6 @@ class State(BaseModel):
                 self.campaign.room_id = room_id
                 return True
         return False
-
-    def make_room(self, direction: str, room_name: str):
-        room = self.rooms[self.campaign.room_id]
-        room_id = generate_id()
-        room.actions[direction] = GoToRoomAction(room_id=room_id)
-        self.rooms[room_id] = Room(name=room_name, desc="", actions={})
 
     def choose_campaign(self):
         campaigns = self.campaigns or []
@@ -198,3 +221,17 @@ class State(BaseModel):
         else:
             self.campaign_index = option - 1
         self.campaign.room_id = self.campaign.room_id or CLONING_TUBE_ID
+
+    def show_equipment(self):
+        output = []
+        for character in self.characters:
+            output.append(f"Name: {character.name}")
+            output.append("(EQUIPMENT:)")
+            for location in wear_location:
+                layers = getattr(character, location)
+                if layers:
+                    output.append(f"{location}:")
+                    for layer in layers:
+                        output.append(layer)
+                    output.append("")
+        return "\n".join(output)

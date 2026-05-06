@@ -29,8 +29,8 @@
   ],
   "rooms": {
     "vnum0": {
-      "name": "Cloning tube",
-      "desc": "You are in a cloning tube\n",
+      "name": "Entry chamber",
+      "desc": "A small, enclosed room with smooth metal walls and a softly glowing panel at eye\nlevel. Text scrolls across it with simple instructions for getting started.\n\nTo move, type a direction (north, south, east, west, up, or down) and press\nenter.",
       "actions": {
         "north": {
           "action": "gotoroom",

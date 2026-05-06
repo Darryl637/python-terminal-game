@@ -7,11 +7,22 @@ from src.utility import (
     generate_id,
     validate_campaign_player_count,
 )
-from src.models import State, CLONING_TUBE_ID, Room, GoToRoomAction, Campaign
+from src.models import (
+    State,
+    CLONING_TUBE_ID,
+    Room,
+    GoToRoomAction,
+    Campaign,
+    ItemBase,
+    Character,
+    Layers,
+    HeldItem,
+)
 from unittest import mock
 import pytest
 
 TEST_DIRECTION = "north"
+OTHER_ROOM_ID = "other room"
 
 
 @pytest.fixture
@@ -21,9 +32,33 @@ def dummy_state():
     state.rooms[CLONING_TUBE_ID] = Room(
         name="Cloning tube",
         desc="You are in a cloning tube\n",
-        actions={TEST_DIRECTION: GoToRoomAction(room_id="string")},
+        actions={TEST_DIRECTION: GoToRoomAction(room_id=OTHER_ROOM_ID)},
     )
-    state.campaigns.append(Campaign(room_id=CLONING_TUBE_ID))
+    state.rooms[OTHER_ROOM_ID] = Room(
+        name="other room",
+        desc="a description",
+        actions={TEST_DIRECTION: GoToRoomAction(room_id=CLONING_TUBE_ID)},
+    )
+
+    state.campaigns.append(
+        Campaign(
+            room_id=CLONING_TUBE_ID,
+            characters=[
+                Character(
+                    Strength=1,
+                    Dexterity=2,
+                    Wisdom=3,
+                    Intelligence=4,
+                    Constitution=5,
+                    hitroll=6,
+                    damroll=7,
+                    armor=8,
+                    name="testname",
+                    torso=[],
+                )
+            ],
+        )
+    )
     return state
 
 
@@ -113,6 +148,16 @@ def test__set_state_with_line__stores_line():
         assert d.zaboomafom == user_input
 
 
+def test__itembase_fill__name():
+    user_input = "namecheck"
+    price = 5
+    item = ItemBase()
+    with mock.patch("builtins.input", side_effect=[user_input, price]):
+        item.fill()
+        assert item.name == user_input
+        assert item.value == price
+
+
 def test__set_state_with_number__it_skips():
     d = Dummy()
     path = "zaboomafom"
@@ -159,3 +204,47 @@ def test__make_roomc__add_a_room__it_works(dummy_state):
     assert (
         other_action.room_id == dummy_state.campaign.room_id
     )  # this checks to make sure new room connects to current room
+
+
+def test__state__set_room_name(dummy_state):
+    room_name = "hallway"
+    dummy_state.set_room_name(room_name)
+    assert dummy_state.room.name == room_name
+
+
+def test__state__delete_room(dummy_state):
+    assert OTHER_ROOM_ID in dummy_state.rooms
+    assert len(dummy_state.rooms[CLONING_TUBE_ID].actions) == 1
+    dummy_state.delete_room(OTHER_ROOM_ID)
+    assert OTHER_ROOM_ID not in dummy_state.rooms
+    assert len(dummy_state.rooms[CLONING_TUBE_ID].actions) == 0
+
+
+def test__state__get_score(dummy_state):
+    score = dummy_state.get_score()
+    assert score == "\n".join(
+        [
+            "-= Score for testname =-",
+            "Str: 1",
+            "Dex: 2",
+            "Wis: 3",
+            "Int: 4",
+            "Con: 5",
+            "",
+            "hitroll: 6     damroll: 7     armor: 8",
+        ]
+    )
+
+
+def test__state__makeroom(dummy_state):
+    direction = "down"
+    name = "start room"
+    room_id, _ = dummy_state.make_room(direction, name)
+    assert room_id in dummy_state.rooms
+    assert room_id == dummy_state.room.actions[direction].room_id
+
+
+def test__state__show_equipment(dummy_state):
+    equipment = dummy_state.show_equipment()
+    print(equipment)
+    assert equipment == ""
