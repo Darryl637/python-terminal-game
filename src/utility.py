@@ -1,5 +1,6 @@
 import uuid
 from typing import TypeVar, List, Callable, Any
+from src.constants import STATS
 
 T = TypeVar("T")
 
@@ -27,6 +28,13 @@ def is_non_negative(number: int):
 
 def is_positive(number: int):
     return number > 0
+
+
+def add_stats(destination, source):
+    for stat in STATS:
+        destination_value = destination.get(stat, 0) or 0
+        source_value = getattr(source, stat)
+        destination[stat] = destination_value + source_value
 
 
 def get_number(prompt: str, validator: Callable[[int], bool] = is_valid) -> int:

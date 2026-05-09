@@ -10,6 +10,7 @@ from src.utility import (
     is_positive,
     get_choice,
     generate_id,
+    add_stats,
 )
 
 
@@ -19,11 +20,11 @@ class HeldItem(BaseModel):
 
 
 class Layers(BaseModel):
-    first: HeldItem | None = None
-    second: HeldItem | None = None
-    third: HeldItem | None = None
-    forth: HeldItem | None = None
-    fifth: HeldItem | None = None
+    first: Union[HeldItem, None] = None
+    second: Union[HeldItem, None] = None
+    third: Union[HeldItem, None] = None
+    forth: Union[HeldItem, None] = None
+    fifth: Union[HeldItem, None] = None
 
 
 class Character(BaseModel):
@@ -66,7 +67,7 @@ class ItemBase(BaseModel):
 
 
 WearLocation = Literal["head", "torso", "waist", "legs", "hands", "feet", "arms"]
-wear_location = ["head", "torso", "waist", "legs", "hands", "feet", "arms"]
+wear_locations = ["head", "torso", "waist", "legs", "hands", "feet", "arms"]
 
 
 class Combatable(ItemBase):
@@ -86,11 +87,11 @@ class Wearable(Combatable):
 
     def fill(self):
         super().fill()
-        set_state_with_choice(self, "wear_location", "Where is it worn", wear_location)
+        set_state_with_choice(self, "wear_location", "Where is it worn", wear_locations)
 
 
 LayerLocation = Literal["first", "second", "third", "forth", "fifth"]
-layer_location = ["first", "second", "third", "forth", "fifth"]
+layer_locations = ["first", "second", "third", "forth", "fifth"]
 
 
 class Armor(Wearable):
@@ -101,7 +102,7 @@ class Armor(Wearable):
     def fill(self):
         super().fill()
         set_state_with_choice(
-            self, "layer_loc", "what is the layer location", layer_location
+            self, "layer_loc", "what is the layer location", layer_locations
         )
         set_state_with_number(self, "armor", "what is armor stat", is_non_negative)
 
@@ -163,7 +164,25 @@ class State(BaseModel):
     def characters(self):
         return self.campaign.characters
 
+    def calulate_score(self):
+        characters = []
+        for character in self.characters:
+            stats = {}
+            add_stats(stats, character)
+            for wear_location in wear_locations:
+                for layer in getattr(character, wear_location):
+                    for layer_location in layer_locations:
+                        held_item = getattr(layer, layer_location)
+                        if held_item:
+                            item = self.items[held_item.item_id]
+                            if item:
+                                print(held_item)
+                                add_stats(stats, item)
+            print(stats)
+        raise Exception()
+
     def get_score(self):
+        self.calulate_score()
         output = []
         for character in self.characters:
             output.append(f"-= Score for {character.name} =-")
@@ -172,7 +191,7 @@ class State(BaseModel):
             output.append("")
 
             output.append(
-                f"hitroll: {character.hitroll}     damroll: {character.damroll}     armor: {character.armor}"
+                f"hitroll: {character.hitroll}, damroll: {character.damroll}, armor: {character.armor}"
             )
         return "\n".join(output)
 
@@ -224,14 +243,26 @@ class State(BaseModel):
 
     def show_equipment(self):
         output = []
-        for character in self.characters:
-            output.append(f"Name: {character.name}")
-            output.append("(EQUIPMENT:)")
-            for location in wear_location:
+        for index, character in enumerate(self.characters):
+            if index:
+                output.append("")
+            output.append(f"Name: {character.name.upper()}")
+            output.append("")
+            for location in wear_locations:
                 layers = getattr(character, location)
                 if layers:
-                    output.append(f"{location}:")
-                    for layer in layers:
-                        output.append(layer)
-                    output.append("")
+                    for layer_index, layer in enumerate(layers):
+                        if len(layers) > 1:
+                            output.append(f"{location} {layer_index + 1}:")
+                        else:
+                            output.append(f"{location}:")
+                        for layer_location in layer_locations:
+                            held_item = getattr(layer, layer_location)
+                            if held_item:
+                                item = self.items[held_item.item_id]
+                                if item:
+                                    output.append(
+                                        f"\t{layer_location}: {item.name} ({held_item.durability} / {item.durability})"
+                                    )
+
         return "\n".join(output)

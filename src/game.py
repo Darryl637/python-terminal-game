@@ -10,7 +10,7 @@ from src.models import (
     GoToRoomAction,
     Campaign,
     wear_location,
-    layer_location,
+    layer_locations,
     ItemBase,
     Armor,
     Weapon,

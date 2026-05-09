@@ -17,6 +17,8 @@ from src.models import (
     Character,
     Layers,
     HeldItem,
+    Armor,
+    Combatable,
 )
 from unittest import mock
 import pytest
@@ -39,24 +41,30 @@ def dummy_state():
         desc="a description",
         actions={TEST_DIRECTION: GoToRoomAction(room_id=CLONING_TUBE_ID)},
     )
+    item_id = "abc123"
+    held_item = HeldItem(item_id=item_id, durability=100)
+    layers = Layers(first=held_item, third=held_item)
+    item = Combatable(name="helmet", durability=200)
+    state.items[item_id] = item
+    character = Character(
+        Strength=1,
+        Dexterity=2,
+        Wisdom=3,
+        Intelligence=4,
+        Constitution=5,
+        hitroll=6,
+        damroll=7,
+        armor=8,
+        name="testname",
+        torso=[layers, layers],
+        head=[layers, layers],
+        feet=[layers],
+    )
 
     state.campaigns.append(
         Campaign(
             room_id=CLONING_TUBE_ID,
-            characters=[
-                Character(
-                    Strength=1,
-                    Dexterity=2,
-                    Wisdom=3,
-                    Intelligence=4,
-                    Constitution=5,
-                    hitroll=6,
-                    damroll=7,
-                    armor=8,
-                    name="testname",
-                    torso=[],
-                )
-            ],
+            characters=[character, character],
         )
     )
     return state
@@ -148,14 +156,47 @@ def test__set_state_with_line__stores_line():
         assert d.zaboomafom == user_input
 
 
-def test__itembase_fill__name():
+# Itembase
+# Combatable inherit
+# Wearable inherit
+# Armor inherit
+
+
+def test__armor_fill__name():
     user_input = "namecheck"
     price = 5
-    item = ItemBase()
-    with mock.patch("builtins.input", side_effect=[user_input, price]):
+    damageroll = 1
+    hitroll = 1
+    durability = 500
+    wear_location = 1
+    type = "Armor"
+    armor = 0
+    layer_loc = 1
+    item = Armor()
+    with mock.patch(
+        "builtins.input",
+        side_effect=[
+            user_input,
+            price,
+            damageroll,
+            hitroll,
+            durability,
+            wear_location,
+            type,
+            layer_loc,
+            armor,
+        ],
+    ):
         item.fill()
         assert item.name == user_input
         assert item.value == price
+        assert item.damageroll == damageroll
+        assert item.hitroll == hitroll
+        assert item.durability == durability
+        assert item.wear_location == "head"
+        assert item.type == type
+        assert item.layer_loc == "first"
+        assert item.armor == armor
 
 
 def test__set_state_with_number__it_skips():
@@ -222,6 +263,7 @@ def test__state__delete_room(dummy_state):
 
 def test__state__get_score(dummy_state):
     score = dummy_state.get_score()
+    print(score)
     assert score == "\n".join(
         [
             "-= Score for testname =-",
@@ -231,7 +273,15 @@ def test__state__get_score(dummy_state):
             "Int: 4",
             "Con: 5",
             "",
-            "hitroll: 6     damroll: 7     armor: 8",
+            "hitroll: 6, damroll: 7, armor: 8",
+            "-= Score for testname =-",
+            "Str: 1",
+            "Dex: 2",
+            "Wis: 3",
+            "Int: 4",
+            "Con: 5",
+            "",
+            "hitroll: 6, damroll: 7, armor: 8",
         ]
     )
 
@@ -247,4 +297,41 @@ def test__state__makeroom(dummy_state):
 def test__state__show_equipment(dummy_state):
     equipment = dummy_state.show_equipment()
     print(equipment)
-    assert equipment == ""
+    assert (
+        equipment
+        == """Name: TESTNAME
+
+head 1:
+\tfirst: helmet (100 / 200)
+\tthird: helmet (100 / 200)
+head 2:
+\tfirst: helmet (100 / 200)
+\tthird: helmet (100 / 200)
+torso 1:
+\tfirst: helmet (100 / 200)
+\tthird: helmet (100 / 200)
+torso 2:
+\tfirst: helmet (100 / 200)
+\tthird: helmet (100 / 200)
+feet:
+\tfirst: helmet (100 / 200)
+\tthird: helmet (100 / 200)
+
+Name: TESTNAME
+
+head 1:
+\tfirst: helmet (100 / 200)
+\tthird: helmet (100 / 200)
+head 2:
+\tfirst: helmet (100 / 200)
+\tthird: helmet (100 / 200)
+torso 1:
+\tfirst: helmet (100 / 200)
+\tthird: helmet (100 / 200)
+torso 2:
+\tfirst: helmet (100 / 200)
+\tthird: helmet (100 / 200)
+feet:
+\tfirst: helmet (100 / 200)
+\tthird: helmet (100 / 200)"""
+    )
