@@ -1,7 +1,9 @@
 import uuid
-from typing import TypeVar, List, Callable, Any
+from typing import TypeVar, List, Callable, Any, TYPE_CHECKING
 from src.constants import STATS
 
+if TYPE_CHECKING:
+    from src.models import Statistics
 T = TypeVar("T")
 
 
@@ -30,7 +32,7 @@ def is_positive(number: int):
     return number > 0
 
 
-def add_stats(destination, source):
+def add_stats(destination: dict[str, int], source: "Statistics"):
     for stat in STATS:
         destination_value = destination.get(stat, 0) or 0
         source_value = getattr(source, stat)

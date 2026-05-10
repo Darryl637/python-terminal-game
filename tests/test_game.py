@@ -44,7 +44,7 @@ def dummy_state():
     item_id = "abc123"
     held_item = HeldItem(item_id=item_id, durability=100)
     layers = Layers(first=held_item, third=held_item)
-    item = Combatable(name="helmet", durability=200)
+    item = Combatable(name="helmet", durability=200, Strength=4)
     state.items[item_id] = item
     character = Character(
         Strength=1,
@@ -263,25 +263,27 @@ def test__state__delete_room(dummy_state):
 
 def test__state__get_score(dummy_state):
     score = dummy_state.get_score()
-    print(score)
     assert score == "\n".join(
         [
             "-= Score for testname =-",
-            "Str: 1",
+            "Str: 41",
             "Dex: 2",
             "Wis: 3",
             "Int: 4",
             "Con: 5",
+            "dam: 0",
+            "hit: 6",
+            "arm: 8",
             "",
-            "hitroll: 6, damroll: 7, armor: 8",
             "-= Score for testname =-",
-            "Str: 1",
+            "Str: 41",
             "Dex: 2",
             "Wis: 3",
             "Int: 4",
             "Con: 5",
-            "",
-            "hitroll: 6, damroll: 7, armor: 8",
+            "dam: 0",
+            "hit: 6",
+            "arm: 8",
         ]
     )
 

@@ -27,16 +27,19 @@ class Layers(BaseModel):
     fifth: Union[HeldItem, None] = None
 
 
-class Character(BaseModel):
-    name: str = ""
+class Statistics(BaseModel):
     Strength: int = 0
     Dexterity: int = 0
     Wisdom: int = 0
     Intelligence: int = 0
     Constitution: int = 0
     hitroll: int = 0
-    damroll: int = 0
+    damageroll: int = 0
     armor: int = 0
+
+
+class Character(Statistics):
+    name: str = ""
     head: List[
         Layers
     ] = []  # This represents items being worn by each head 1+ head locations
@@ -70,9 +73,7 @@ WearLocation = Literal["head", "torso", "waist", "legs", "hands", "feet", "arms"
 wear_locations = ["head", "torso", "waist", "legs", "hands", "feet", "arms"]
 
 
-class Combatable(ItemBase):
-    damageroll: int = 1
-    hitroll: int = 1
+class Combatable(ItemBase, Statistics):
     durability: int = 500
 
     def fill(self):
@@ -96,7 +97,7 @@ layer_locations = ["first", "second", "third", "forth", "fifth"]
 
 class Armor(Wearable):
     type: Literal["Armor"] = "Armor"
-    armor: int = 0
+
     layer_loc: LayerLocation = "first"
 
     def fill(self):
@@ -164,35 +165,30 @@ class State(BaseModel):
     def characters(self):
         return self.campaign.characters
 
-    def calulate_score(self):
-        characters = []
-        for character in self.characters:
-            stats = {}
-            add_stats(stats, character)
-            for wear_location in wear_locations:
-                for layer in getattr(character, wear_location):
-                    for layer_location in layer_locations:
-                        held_item = getattr(layer, layer_location)
-                        if held_item:
-                            item = self.items[held_item.item_id]
-                            if item:
-                                print(held_item)
-                                add_stats(stats, item)
-            print(stats)
-        raise Exception()
+    def calculate_score(self, character: Character):
+        stats = {}
+        add_stats(stats, character)
+        for wear_location in wear_locations:
+            for layer in getattr(character, wear_location):
+                for layer_location in layer_locations:
+                    held_item = getattr(layer, layer_location)
+                    if held_item:
+                        item = self.items[held_item.item_id]
+                        if item:
+                            add_stats(stats, item)
+        return stats
 
     def get_score(self):
-        self.calulate_score()
-        output = []
-        for character in self.characters:
-            output.append(f"-= Score for {character.name} =-")
-            for stat in STATS:
-                output.append(f"{stat[0:3]}: {getattr(character, stat)}")
-            output.append("")
 
-            output.append(
-                f"hitroll: {character.hitroll}, damroll: {character.damroll}, armor: {character.armor}"
-            )
+        output = []
+        for index, character in enumerate(self.characters):
+            if index:
+                output.append("")
+            output.append(f"-= Score for {character.name} =-")
+            calculated_score = self.calculate_score(character)
+            for stat in STATS:
+                output.append(f"{stat[0:3]}: {calculated_score[stat]}")
+
         return "\n".join(output)
 
     def delete_room(self, room_id: str):

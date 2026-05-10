@@ -16,7 +16,7 @@ from src.models import (
     Weapon,
     HeldItem,
 )
-from src.constants import NEW_GAME, STATS
+from src.constants import NEW_GAME, ROLLED_STATS
 from src.utility import (
     generate_id,
     get_choice,
@@ -240,7 +240,7 @@ class Game:
         self.save_state()
         character_name = character.name
         stat_pool = 75
-        for stat in STATS:
+        for stat in ROLLED_STATS:
             already_allocated_stat = getattr(character, stat) or 0
             stat_pool = stat_pool - already_allocated_stat
 
@@ -250,7 +250,7 @@ class Game:
         if stat_pool > 0:
             print(f"Pick stats for {character_name}")
             while stat_pool > 0:
-                for stat in STATS:
+                for stat in ROLLED_STATS:
                     value = get_number(
                         f"Pick your {stat} ({stat_pool} remaining points)",
                         validate_stat,
