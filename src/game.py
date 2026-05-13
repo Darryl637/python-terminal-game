@@ -9,7 +9,7 @@ from src.models import (
     Room,
     GoToRoomAction,
     Campaign,
-    wear_location,
+    wear_locations,
     layer_locations,
     ItemBase,
     Armor,
