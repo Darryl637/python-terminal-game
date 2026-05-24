@@ -27,6 +27,7 @@ from src.utility import (
     validate_campaign_player_count,
     get_line,
 )
+from src.commands import run_command, DO_NOT_PRINT, QUIT
 
 
 class Game:
@@ -86,16 +87,11 @@ class Game:
                     print(item)
             needsprompt = True
 
-            action = get_line(">")
+            line = get_line(">")
 
-            match action:
+            match line:
                 case "look":
                     needsprompt = True
-
-                case s if s.startswith("makeroom "):
-                    command, todirection, fromdirection, *room_name = s.split()
-                    room_name = " ".join(room_name)
-                    self.state.make_roomc(room_name, todirection, fromdirection)
 
                 case s if s.startswith("make "):
                     command, type = s.lower().split()
@@ -147,15 +143,8 @@ class Game:
                     if not found:
                         print("You don't have that item")
 
-                case s if s.startswith("setroomname "):
-                    command, *room_name = s.split()
-                    room_name = " ".join(room_name)
-                    self.state.set_room_name(room_name)
                 case id if id.startswith("vin "):
                     print(room_id)
-                case s if s.startswith("makeexit "):
-                    command, direction, room_id = s.split()
-                    room.actions[direction] = GoToRoomAction(room_id=room_id)
 
                 case d if d.startswith("roomdesc "):
                     print("Enter new room description")
@@ -188,9 +177,6 @@ class Game:
                     # Rejoin with a blank line between paragraphs
                     room.desc = "\n\n".join(wrapped_paragraphs)
 
-                case d if d.startswith("deleteroom "):
-                    command, room_id = d.split()
-                    self.state.delete_room(room_id)
                 case s if s.startswith("spawn "):
                     command, search = s.split()
                     items = [
@@ -212,16 +198,12 @@ class Game:
                         held_item.durability = item.durability
                         room.items.append(held_item)
 
-                case s if s.startswith("score"):
-                    print(self.state.get_score())
-
-                    needsprompt = False
-                case q if q.startswith("quit"):
-                    break
-
                 case _:
-                    if not self.state.go_direction(action):
-                        print("you can't go that way")
+                    result = run_command(state=self.state, line=line)
+                    if result == DO_NOT_PRINT:
+                        needsprompt = False
+                    if result == QUIT:
+                        break
 
             self.save_state()
 

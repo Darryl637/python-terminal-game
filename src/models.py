@@ -187,9 +187,22 @@ class State(BaseModel):
             output.append(f"-= Score for {character.name} =-")
             calculated_score = self.calculate_score(character)
             for stat in STATS:
-                output.append(f"{stat[0:3]}: {calculated_score[stat]}")
+                print(character.stat)
+                original_score = getattr(character, stat)
+                output.append(f"{stat[0:3]}: {original_score}|{calculated_score[stat]}")
 
         return "\n".join(output)
+
+    def search_rooms(self, search):
+        filtered = [
+            (room_id, room)
+            for (room_id, room) in self.rooms.items()
+            if search in room.name
+        ]
+        return "\n".join([f"{room.name}: {room_id}" for room_id, room in filtered])
+
+    def make_exit(self, direction, room_id):
+        self.room.actions[direction] = GoToRoomAction(room_id=room_id)
 
     def delete_room(self, room_id: str):
         del self.rooms[room_id]
