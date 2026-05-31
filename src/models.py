@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List, Literal, Union
+from typing import List, Literal, Union, Callable
 from src.constants import NEW_GAME, STATS
 from src.utility import (
     set_state_with_line,
@@ -11,6 +11,8 @@ from src.utility import (
     get_choice,
     generate_id,
     add_stats,
+    set_state_with_list,
+    set_state_with_dict,
 )
 
 
@@ -57,6 +59,7 @@ class Campaign(BaseModel):
     name: str = ""
     room_id: str = ""
     character_count: int = 0
+    flags: dict[str, bool] = {}
     inventory: List[HeldItem] = []
 
 
@@ -144,13 +147,72 @@ ROOMS = {
 }
 
 
+class MobLocation(BaseModel):
+    # is_visible: Callable[[Campaign], bool]
+    room_id: str
+
+
+def is_visible(state: Campaign):
+    return True
+
+
+class MobConversation(BaseModel):
+    text: str = ""
+    item_ids: list[str] = []
+    set_flags: dict[str, bool] = {}
+    visible_flags: dict[str, bool] = {}
+
+    def fill(self):
+        set_state_with_line(self, "text", "what do you want them to say")
+        set_state_with_list(self, "item_ids", "what items ids should they have")
+        set_state_with_dict(
+            self, "set_flags", "what flag should update after conversation"
+        )
+        set_state_with_dict(
+            self, "visible_flags", "what flag are needed to have conversation"
+        )
+
+
+class BasicMob(BaseModel):
+    name: str
+    locations: List[MobLocation] = []
+    conversations: List[MobConversation] = []
+
+
+def mob_location_room(room_id: str):
+    def inner(campaign: Campaign):
+        return campaign.room_id == room_id
+
+    return inner
+
+
 class State(BaseModel):
     campaigns: List[Campaign] = []
     rooms: dict[str, Room] = (
         ROOMS  # "Room" the quotes are saying to wait until file is loaded
     )
     campaign_index: int = -1
-    items: dict[str, Item] = {}
+    items: dict[str, Item] = {"stuff": Weapon()}
+    # makemob <name>
+    # makemob addlocation <mobname> <room_id>
+    # makemob <name> add_conversation
+    mobs: List[BasicMob] = [
+        BasicMob(
+            name="droid",
+            locations=[MobLocation(room_id="vnum0")],
+            conversations=[
+                MobConversation(
+                    text="have you seen these jedi",
+                    item_ids=["stuff"],
+                    visible_flags={"got_item": False},
+                    set_flags={"got_item": True},
+                ),
+                MobConversation(
+                    text="Move along I'm busy",
+                ),
+            ],
+        )
+    ]
 
     @property
     def room(self):
@@ -164,6 +226,44 @@ class State(BaseModel):
     @property
     def characters(self):
         return self.campaign.characters
+
+    def make_mob(self, name):
+        self.mobs.append(BasicMob(name=name))
+
+    def make_mob_location(self, name, room_id):
+        for mob in self.mobs:
+            if mob.name == name:
+                mob.locations.append(MobLocation(room_id=room_id))
+
+    def make_mob_conversation(self, name, mob_conversation):
+        for mob in self.mobs:
+            if mob.name == name:
+                mob.conversations.append(mob_conversation)
+
+    def say(self, target: str):
+        for mob in self.mobs:
+            if mob.name == target:
+                for location in mob.locations:
+                    if location.room_id == self.campaign.room_id:
+                        for conversation in mob.conversations:
+                            if self._can_have_conversation(conversation):
+                                return self._have_convsation(conversation)
+                return "They have nothing to say"
+
+    def _can_have_conversation(self, conversation):
+        # detect if flag is set to override conversation
+        for key, value in conversation.visible_flags.items():
+            if self.campaign.flags.get(key, False) != value:
+                return False
+        return True
+
+    def _have_convsation(self, conversation):
+        # the [key] is the key value updating the value of the key
+        for key, value in conversation.set_flags.items():
+            self.campaign.flags[key] = value
+        for item_id in conversation.item_ids:
+            self.campaign.inventory.append(HeldItem(item_id=item_id))
+        return conversation.text
 
     def calculate_score(self, character: Character):
         stats = {}

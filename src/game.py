@@ -79,9 +79,15 @@ class Game:
                 )
 
                 print("Obvious exits: \n" + "\n".join(actions))
+
                 print(
                     "--------------------------------------------------------------------------------"
                 )
+                for mob in self.state.mobs:
+                    for location in mob.locations:
+                        if location.room_id == room_id:
+                            print(f"{mob.name} is in the room")
+                            break
 
                 for item in room.items:
                     print(item)
@@ -243,8 +249,9 @@ class Game:
                     self.save_state()
 
     def save_state(self):
+        print(self.state)
+        contents = self.state.model_dump_json(indent=2)
         with open("state.json", "w") as f:
-            contents = self.state.model_dump_json(indent=2)
             f.write(contents)
 
     def load_state(self):

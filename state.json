@@ -11,7 +11,25 @@
           "hitroll": 0,
           "damageroll": 0,
           "armor": 0,
-          "name": "1",
+          "name": "bob",
+          "head": [],
+          "torso": [],
+          "waist": [],
+          "legs": [],
+          "hands": [],
+          "feet": [],
+          "arms": []
+        },
+        {
+          "Strength": 13,
+          "Dexterity": 34,
+          "Wisdom": 4,
+          "Intelligence": 12,
+          "Constitution": 12,
+          "hitroll": 0,
+          "damageroll": 0,
+          "armor": 0,
+          "name": "hdid",
           "head": [],
           "torso": [],
           "waist": [],
@@ -22,95 +40,164 @@
         }
       ],
       "name": "Campaign 1",
-      "room_id": "1f11029b-25b4-4fbb-b8e5-e23e3fe28046",
+      "room_id": "vnum0",
+      "character_count": 2,
+      "flags": {
+        "got_item": true
+      },
+      "inventory": [
+        {
+          "item_id": "stuff",
+          "durability": 500
+        },
+        {
+          "item_id": "stuff",
+          "durability": 500
+        },
+        {
+          "item_id": "stuff",
+          "durability": 500
+        },
+        {
+          "item_id": "stuff",
+          "durability": 500
+        },
+        {
+          "item_id": "stuff",
+          "durability": 500
+        },
+        {
+          "item_id": "stuff",
+          "durability": 500
+        },
+        {
+          "item_id": "",
+          "durability": 500
+        }
+      ]
+    },
+    {
+      "characters": [
+        {
+          "Strength": 15,
+          "Dexterity": 15,
+          "Wisdom": 15,
+          "Intelligence": 15,
+          "Constitution": 15,
+          "hitroll": 0,
+          "damageroll": 0,
+          "armor": 0,
+          "name": "bob",
+          "head": [],
+          "torso": [],
+          "waist": [],
+          "legs": [],
+          "hands": [],
+          "feet": [],
+          "arms": []
+        }
+      ],
+      "name": "Campaign 2",
+      "room_id": "vnum0",
       "character_count": 1,
-      "inventory": []
+      "flags": {
+        "got_item": true
+      },
+      "inventory": [
+        {
+          "item_id": "stuff",
+          "durability": 500
+        }
+      ]
     }
   ],
   "rooms": {
     "vnum0": {
-      "name": "academy entrance",
-      "desc": "A small, enclosed room with smooth metal walls and a softly glowing panel at eye\nlevel. Text scrolls across it with simple instructions for getting started.\n\nTo move, type a direction (north, south, east, west, up, or down) and press\nenter.",
+      "name": "Cloning tube",
+      "desc": "You are in a cloning tube\n",
       "actions": {
         "north": {
           "action": "gotoroom",
-          "room_id": "f51e3c55-82db-4ed4-bcf5-4332c3b7df6d"
+          "room_id": "f00a3557-cb49-4b9e-a9cc-5a35d7fb5fe0"
         }
       },
       "items": []
     },
-    "f51e3c55-82db-4ed4-bcf5-4332c3b7df6d": {
+    "f00a3557-cb49-4b9e-a9cc-5a35d7fb5fe0": {
       "name": "hallway",
       "desc": "",
       "actions": {
         "south": {
           "action": "gotoroom",
           "room_id": "vnum0"
-        },
-        "north": {
-          "action": "gotoroom",
-          "room_id": "085e46dd-7a94-4d3b-bd13-6695cf79b13f"
-        },
-        "west": {
-          "action": "gotoroom",
-          "room_id": "878e7a63-bf7d-43a7-918c-b1e6880c0dcc"
-        }
-      },
-      "items": []
-    },
-    "085e46dd-7a94-4d3b-bd13-6695cf79b13f": {
-      "name": "hallway",
-      "desc": "",
-      "actions": {
-        "south": {
-          "action": "gotoroom",
-          "room_id": "f51e3c55-82db-4ed4-bcf5-4332c3b7df6d"
-        },
-        "up": {
-          "action": "gotoroom",
-          "room_id": "1f11029b-25b4-4fbb-b8e5-e23e3fe28046"
-        }
-      },
-      "items": []
-    },
-    "878e7a63-bf7d-43a7-918c-b1e6880c0dcc": {
-      "name": "item training",
-      "desc": "",
-      "actions": {
-        "east": {
-          "action": "gotoroom",
-          "room_id": "f51e3c55-82db-4ed4-bcf5-4332c3b7df6d"
-        }
-      },
-      "items": []
-    },
-    "1f11029b-25b4-4fbb-b8e5-e23e3fe28046": {
-      "name": "academy cafe",
-      "desc": "",
-      "actions": {
-        "down": {
-          "action": "gotoroom",
-          "room_id": "085e46dd-7a94-4d3b-bd13-6695cf79b13f"
-        },
-        "west": {
-          "action": "gotoroom",
-          "room_id": "a787ab54-ee04-45e1-8cc8-4e119f89d7cd"
-        }
-      },
-      "items": []
-    },
-    "a787ab54-ee04-45e1-8cc8-4e119f89d7cd": {
-      "name": "bunk room",
-      "desc": "",
-      "actions": {
-        "east": {
-          "action": "gotoroom",
-          "room_id": "1f11029b-25b4-4fbb-b8e5-e23e3fe28046"
         }
       },
       "items": []
     }
   },
   "campaign_index": 0,
-  "items": {}
+  "items": {
+    "stuff": {
+      "Strength": 0,
+      "Dexterity": 0,
+      "Wisdom": 0,
+      "Intelligence": 0,
+      "Constitution": 0,
+      "hitroll": 0,
+      "damageroll": 0,
+      "armor": 0,
+      "name": "",
+      "value": 0,
+      "durability": 500,
+      "type": "Weapon"
+    }
+  },
+  "mobs": [
+    {
+      "name": "droid",
+      "locations": [
+        {
+          "room_id": "vnum0"
+        }
+      ],
+      "conversations": [
+        {
+          "text": "have you seen these jedi",
+          "item_ids": [
+            "stuff"
+          ],
+          "set_flags": {
+            "got_item": true
+          },
+          "visible_flags": {
+            "got_item": false
+          }
+        },
+        {
+          "text": "Move along I'm busy",
+          "item_ids": [],
+          "set_flags": {},
+          "visible_flags": {}
+        }
+      ]
+    },
+    {
+      "name": "c3pq",
+      "locations": [
+        {
+          "room_id": "vnum0"
+        }
+      ],
+      "conversations": [
+        {
+          "text": "hello\\",
+          "item_ids": [
+            ""
+          ],
+          "set_flags": {},
+          "visible_flags": {}
+        }
+      ]
+    }
+  ]
 }

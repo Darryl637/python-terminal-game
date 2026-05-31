@@ -1,4 +1,4 @@
-from src.models import State
+from src.models import State, MobConversation
 from typing import Callable
 
 DO_NOT_PRINT = 1
@@ -50,7 +50,21 @@ def quit(arguments: CommandArguments):
     return QUIT
 
 
-###################################################
+def make_mob(arguments: CommandArguments):
+    name = arguments.argv[0]
+    if len(arguments.argv) == 1:
+        arguments.state.make_mob(name)
+    else:
+        subcommand = arguments.argv[1]
+        if subcommand == "add_location":
+            room_id = arguments.argv[2]
+            arguments.state.make_mob_location(name, room_id)
+        if subcommand == "add_conversation":
+            mob_conversation = MobConversation()
+            mob_conversation.fill()
+            arguments.state.make_mob_conversation(name, mob_conversation)
+
+    return DO_NOT_PRINT
 
 
 def delete_room(arguments: CommandArguments):
@@ -74,6 +88,16 @@ def makeroom(arguments: CommandArguments):
     todirection, fromdirection, *room_name_list = arguments.argv
     room_name = " ".join(room_name_list)
     arguments.state.make_roomc(room_name, todirection, fromdirection)
+
+
+def say(arguments: CommandArguments):
+    target = arguments.argv[0]
+    conversation = arguments.state.say(target)
+    if conversation:
+        print(conversation)
+    else:
+        print("Who are you trying to talk to?")
+    return DO_NOT_PRINT
 
 
 commands = dict(
@@ -101,6 +125,10 @@ commands = dict(
                 description="todo",
                 args=["<todirection>", "<fromdirection>", "<room_name>"],
             ),
+            "say": Command(
+                say, description="What do you want to say", args=["<target>"]
+            ),
+            "makemob": Command(make_mob, description="", args=["<name>"]),
         }.items()
     )
 )

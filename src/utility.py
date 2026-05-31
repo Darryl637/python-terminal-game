@@ -61,6 +61,34 @@ def set_state_with_line(instance: Any, path: str, prompt: str, skip_if_has_value
     setattr(instance, path, get_line(prompt))
 
 
+def set_state_with_list(instance: Any, path: str, prompt: str, skip_if_has_value=False):
+    value = getattr(instance, path)
+    if skip_if_has_value and value:
+        return
+    line = True
+    print(prompt)
+    list = []
+    while line:
+        line = input()
+        list.append(line)
+    setattr(instance, path, list)
+
+
+def set_state_with_dict(instance: Any, path: str, prompt: str, skip_if_has_value=False):
+    value = getattr(instance, path)
+    if skip_if_has_value and value:
+        return
+    print(prompt)
+    dict = {}
+    while True:
+        key = input()
+        if not key:
+            break
+        value = input().lower() == "on"
+        dict[key] = value
+    setattr(instance, path, dict)
+
+
 def set_state_with_number(
     instance: Any,
     path: str,
