@@ -1,5 +1,6 @@
 from src.models import State, MobConversation
 from typing import Callable
+import textwrap
 
 DO_NOT_PRINT = 1
 QUIT = 2
@@ -33,6 +34,38 @@ class Command:
 def setroomname(arguments: CommandArguments):
     room_name = " ".join(arguments.argv)
     arguments.state.set_room_name(room_name)
+
+
+def setroomdesc(arguments: CommandArguments):
+    print("Enter new room description")
+    print("Type CLOSE on new line to finalize description")
+    buffer = []
+
+    while True:
+        line = input()
+        if line.strip().upper() == "CLOSE":
+            break
+        buffer.append(line.rstrip())
+
+    # Join exactly as typed
+    raw_text = "\n".join(buffer)
+
+    # Split into paragraphs (blank lines separate them)
+    paragraphs = [p.strip() for p in raw_text.split("\n\n")]
+
+    wrapped_paragraphs = [
+        textwrap.fill(
+            p,
+            width=80,
+            break_long_words=False,
+            break_on_hyphens=False,
+        )
+        for p in paragraphs
+        if p
+    ]
+
+    # Rejoin with a blank line between paragraphs
+    arguments.state.room.desc = "\n\n".join(wrapped_paragraphs)
 
 
 def help(arguments):
@@ -107,6 +140,11 @@ commands = dict(
                 setroomname,
                 description="sets the name of the room",
                 args=["<room name>"],
+            ),
+            "setroomdesc": Command(
+                setroomdesc,
+                description="sets the description of the room",
+                args=[],
             ),
             "help": Command(
                 help, description="prints help information for all commands"

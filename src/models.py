@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import List, Literal, Union, Callable
-from src.constants import NEW_GAME, STATS
+from src.constants import NEW_GAME, STATS, ROLLED_STATS
 from src.utility import (
     set_state_with_line,
     set_state_with_number,
@@ -287,7 +287,6 @@ class State(BaseModel):
             output.append(f"-= Score for {character.name} =-")
             calculated_score = self.calculate_score(character)
             for stat in STATS:
-                print(character.stat)
                 original_score = getattr(character, stat)
                 output.append(f"{stat[0:3]}: {original_score}|{calculated_score[stat]}")
 

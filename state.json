@@ -114,7 +114,7 @@
   "rooms": {
     "vnum0": {
       "name": "Cloning tube",
-      "desc": "You are in a cloning tube\n",
+      "desc": "stuff\n\nmore stuff",
       "actions": {
         "north": {
           "action": "gotoroom",

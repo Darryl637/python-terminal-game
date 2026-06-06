@@ -2,7 +2,7 @@ from colorama import Fore, Style, init, Back
 from typing import List
 from src.models import ROOMS, Action
 import os
-import textwrap
+
 from src.models import (
     State,
     Character,
@@ -152,37 +152,6 @@ class Game:
                 case id if id.startswith("vin "):
                     print(room_id)
 
-                case d if d.startswith("roomdesc "):
-                    print("Enter new room description")
-                    print("Type CLOSE on new line to finalize description")
-                    buffer = []
-
-                    while True:
-                        line = input()
-                        if line.strip().upper() == "CLOSE":
-                            break
-                        buffer.append(line.rstrip())
-
-                    # Join exactly as typed
-                    raw_text = "\n".join(buffer)
-
-                    # Split into paragraphs (blank lines separate them)
-                    paragraphs = [p.strip() for p in raw_text.split("\n\n")]
-
-                    wrapped_paragraphs = [
-                        textwrap.fill(
-                            p,
-                            width=80,
-                            break_long_words=False,
-                            break_on_hyphens=False,
-                        )
-                        for p in paragraphs
-                        if p
-                    ]
-
-                    # Rejoin with a blank line between paragraphs
-                    room.desc = "\n\n".join(wrapped_paragraphs)
-
                 case s if s.startswith("spawn "):
                     command, search = s.split()
                     items = [
@@ -249,7 +218,6 @@ class Game:
                     self.save_state()
 
     def save_state(self):
-        print(self.state)
         contents = self.state.model_dump_json(indent=2)
         with open("state.json", "w") as f:
             f.write(contents)
