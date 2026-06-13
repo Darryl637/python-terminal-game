@@ -1,22 +1,17 @@
-from colorama import Fore, Style, init, Back
+from colorama import Fore
 from typing import List
-from src.models import ROOMS, Action
-import os
-
 from src.models import (
+    Action,
     State,
     Character,
-    Room,
     GoToRoomAction,
-    Campaign,
-    wear_locations,
-    layer_locations,
-    ItemBase,
     Armor,
     Weapon,
     HeldItem,
 )
-from src.constants import NEW_GAME, ROLLED_STATS
+
+
+from src.constants import ROLLED_STATS
 from src.utility import (
     generate_id,
     get_choice,
@@ -28,6 +23,10 @@ from src.utility import (
     get_line,
 )
 from src.commands import run_command, DO_NOT_PRINT, QUIT
+
+import hmr
+
+run_command = hmr.reload(run_command)
 
 
 class Game:
@@ -96,9 +95,6 @@ class Game:
             line = get_line(">")
 
             match line:
-                case "look":
-                    needsprompt = True
-
                 case s if s.startswith("make "):
                     command, type = s.lower().split()
                     match type:
@@ -112,16 +108,8 @@ class Game:
                     item_id = generate_id()
                     self.state.items[item_id] = item
 
-                case "eq" | "equipment":
-                    print(self.state.show_equipment())
+                    needsprompt = False
 
-                    needsprompt = False
-                case "i" | "inv" | "inventory":
-                    print("Inventory:")
-                    items = self.state.campaign.inventory
-                    for item in items:
-                        print(item)
-                    needsprompt = False
                 case g if g.startswith("get "):
                     command, *item_input = g.split()
                     item_input = " ".join(item_input).lower()
@@ -148,30 +136,6 @@ class Game:
                             break
                     if not found:
                         print("You don't have that item")
-
-                case id if id.startswith("vin "):
-                    print(room_id)
-
-                case s if s.startswith("spawn "):
-                    command, search = s.split()
-                    items = [
-                        (key, item)
-                        for (key, item) in self.state.items.items()
-                        if search.lower() in item.name.lower()
-                    ]
-                    item_names = [item.name for (key, item) in items]
-                    print(list(item_names))
-                    choice = get_choice(
-                        "Which item do you want to spawn?",
-                        [*item_names, "Nevermind"],
-                        returns_index=True,
-                    )
-                    if choice < len(items):
-                        (item_id, item) = items[choice]
-                        held_item = HeldItem()
-                        held_item.item_id = item_id
-                        held_item.durability = item.durability
-                        room.items.append(held_item)
 
                 case _:
                     result = run_command(state=self.state, line=line)

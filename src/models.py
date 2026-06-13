@@ -19,6 +19,10 @@ from src.utility import (
 class HeldItem(BaseModel):
     item_id: str = ""
     durability: int = 500
+    nprop: int = 123
+
+    def __str__(self):
+        return "default item"
 
 
 class Layers(BaseModel):
@@ -332,6 +336,12 @@ class State(BaseModel):
                 self.campaign.room_id = room_id
                 return True
         return False
+
+    def spawn(self, item_id, item):
+        held_item = HeldItem()
+        held_item.item_id = item_id
+        held_item.durability = item.durability
+        self.room.items.append(held_item)
 
     def choose_campaign(self):
         campaigns = self.campaigns or []

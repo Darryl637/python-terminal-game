@@ -1,6 +1,8 @@
-from src.models import State, MobConversation
+from src.models import State, MobConversation, HeldItem
 from typing import Callable
 import textwrap
+from src.utility import get_choice
+
 
 DO_NOT_PRINT = 1
 QUIT = 2
@@ -19,16 +21,27 @@ class Command:
     call_back: Callable[[CommandArguments], int]
     args: list[str]
     description: str
+    short_hand: list[str]
+    is_short_hand: bool = False
 
-    def __init__(self, call_back, description, args=[]):
+    def __init__(self, call_back, description, args=[], short_hand=[]):
         self.args = args
         self.description = description
         self.call_back = call_back
+        self.short_hand = short_hand
+
+    def make_short_hand(self):
+        short_hand = Command(self.call_back, self.description, self.args, [])
+        short_hand.is_short_hand = True
+        return short_hand
 
     def syntax(self, command_name: str):
         args = " ".join([arg for arg in self.args])
         args = f" {args}" if args else ""
-        return f"Syntax: {command_name}{args} - {self.description}"
+        short_hand = ", ".join([short_hand for short_hand in self.short_hand])
+        short_hand = f" [{short_hand}]" if short_hand else ""
+
+        return f"Syntax: {command_name}{args} - {self.description}{short_hand}"
 
 
 def setroomname(arguments: CommandArguments):
@@ -70,7 +83,8 @@ def setroomdesc(arguments: CommandArguments):
 
 def help(arguments):
     for key, value in commands.items():
-        print(value.syntax(key))
+        if not value.is_short_hand:
+            print(value.syntax(key))
     return DO_NOT_PRINT
 
 
@@ -133,6 +147,47 @@ def say(arguments: CommandArguments):
     return DO_NOT_PRINT
 
 
+def look(_: CommandArguments):
+    pass
+
+
+def vin(arguments: CommandArguments):
+    print(arguments.state.campaign.room_id)
+    return DO_NOT_PRINT
+
+
+def equipment(arguments: CommandArguments):
+    print(arguments.state.show_equipment())
+    return DO_NOT_PRINT
+
+
+def inventory(arguments: CommandArguments):
+    print("Inventory:")
+    items = arguments.state.campaign.inventory
+    for item in items:
+        print(item)
+    return DO_NOT_PRINT
+
+
+def spawn(arguments: CommandArguments):
+    search = arguments.argv[0]
+    items = [
+        (key, item)
+        for (key, item) in arguments.state.items.items()
+        if search.lower() in item.name.lower()
+    ]
+    item_names = [item.name for (key, item) in items]
+    print(list(item_names))
+    choice = get_choice(
+        "Which item do you want to spawn?",
+        [*item_names, "Nevermind"],
+        returns_index=True,
+    )
+    if choice < len(items):
+        (item_id, item) = items[choice]
+        arguments.state.spawn(item_id, item)
+
+
 commands = dict(
     sorted(
         {
@@ -167,23 +222,55 @@ commands = dict(
                 say, description="What do you want to say", args=["<target>"]
             ),
             "makemob": Command(make_mob, description="", args=["<name>"]),
+            "look": Command(look, description="reprints character view of room"),
+            "vin": Command(
+                vin, description="shows the vin of the current room you are in"
+            ),
+            "equipment": Command(
+                equipment,
+                description="list characters equipment",
+                short_hand=["eq"],
+            ),
+            "inventory": Command(
+                inventory,
+                description="campaign items",
+                short_hand=["i", "inv"],
+            ),
+            "spawn": Command(
+                spawn,
+                description="spawn item into room",
+            ),
         }.items()
     )
 )
 
 
+for command in list(commands.values()):
+    for short_hand in command.short_hand:
+        if short_hand in commands:
+            print(f"{short_hand} already exists")
+        commands[short_hand] = command.make_short_hand()
+
+
+def invoke(command_name, command, arguments):
+    if len(arguments.argv) < len(command.args):
+        print("Not enough arguments")
+        print(command.syntax(command_name))
+        return DO_NOT_PRINT
+    else:
+        return command.call_back(arguments)
+
+
 def run_command(state: State, line: str):
-    command_name, *argv = line.split()
+    command_line = line.split()
+    if len(command_line) < 1:
+        return DO_NOT_PRINT
+    command_name, *argv = command_line
     arguments = CommandArguments(state, argv)
     if command_name in commands:
         command = commands[command_name]
-        if len(argv) < len(command.args):
-            print("Not enough arguments")
-            print(command.syntax(command_name))
-        else:
-            return command.call_back(arguments)
-    elif state.go_direction(command_name):
+        return invoke(command_name, command, arguments)
+    if state.go_direction(command_name):
         return
-    else:
-        print("you can't go that way")
+    print("you can't go that way")
     return DO_NOT_PRINT

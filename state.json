@@ -48,31 +48,38 @@
       "inventory": [
         {
           "item_id": "stuff",
-          "durability": 500
+          "durability": 500,
+          "nprop": 123
         },
         {
           "item_id": "stuff",
-          "durability": 500
+          "durability": 500,
+          "nprop": 123
         },
         {
           "item_id": "stuff",
-          "durability": 500
+          "durability": 500,
+          "nprop": 123
         },
         {
           "item_id": "stuff",
-          "durability": 500
+          "durability": 500,
+          "nprop": 123
         },
         {
           "item_id": "stuff",
-          "durability": 500
+          "durability": 500,
+          "nprop": 123
         },
         {
           "item_id": "stuff",
-          "durability": 500
+          "durability": 500,
+          "nprop": 123
         },
         {
           "item_id": "",
-          "durability": 500
+          "durability": 500,
+          "nprop": 123
         }
       ]
     },
@@ -106,7 +113,8 @@
       "inventory": [
         {
           "item_id": "stuff",
-          "durability": 500
+          "durability": 500,
+          "nprop": 123
         }
       ]
     }
@@ -121,7 +129,18 @@
           "room_id": "f00a3557-cb49-4b9e-a9cc-5a35d7fb5fe0"
         }
       },
-      "items": []
+      "items": [
+        {
+          "item_id": "stuff",
+          "durability": 500,
+          "nprop": 123
+        },
+        {
+          "item_id": "stuff",
+          "durability": 500,
+          "nprop": 123
+        }
+      ]
     },
     "f00a3557-cb49-4b9e-a9cc-5a35d7fb5fe0": {
       "name": "hallway",
@@ -146,7 +165,7 @@
       "hitroll": 0,
       "damageroll": 0,
       "armor": 0,
-      "name": "",
+      "name": "somethingname",
       "value": 0,
       "durability": 500,
       "type": "Weapon"
