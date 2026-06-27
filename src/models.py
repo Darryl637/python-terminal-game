@@ -19,10 +19,6 @@ from src.utility import (
 class HeldItem(BaseModel):
     item_id: str = ""
     durability: int = 500
-    nprop: int = 123
-
-    def __str__(self):
-        return "default item"
 
 
 class Layers(BaseModel):
@@ -137,7 +133,7 @@ class Room(BaseModel):
     name: str = ""
     desc: str = ""
     actions: dict[str, Action] = {}
-    items: List[str] = []
+    items: List[HeldItem] = []
 
 
 CLONING_TUBE_ID = "vnum0"
@@ -219,7 +215,7 @@ class State(BaseModel):
     ]
 
     @property
-    def room(self):
+    def room(self) -> Room:
         room = self.rooms[self.campaign.room_id]
         return room
 
@@ -230,6 +226,44 @@ class State(BaseModel):
     @property
     def characters(self):
         return self.campaign.characters
+
+    def get_item_by_id(self, id: str):
+        return self.items[id]
+
+    def get(self, item_input: str):
+        for index, held_item in enumerate(self.room.items):
+            item = self.get_item_by_id(held_item.item_id)
+            if item_input in item.name:
+                self.campaign.inventory.append(held_item)
+                self.room.items.pop(index)
+                return True
+        return False
+
+    def drop(self, item_input):
+        for index, held_item in enumerate(self.campaign.inventory):
+            item = self.get_item_by_id(held_item.item_id)
+            if item_input == item.name.lower():
+                self.room.items.append(held_item)
+                self.campaign.inventory.pop(index)
+
+                return True
+        return False
+
+    def make(self, type, do_fill=True):
+        match type:
+            case "armor":
+                item = Armor()
+
+            case "weapon":
+                item = Weapon()
+
+            case _:
+                return False
+        if do_fill:
+            item.fill()
+        item_id = generate_id()
+        self.items[item_id] = item
+        return item_id
 
     def make_mob(self, name):
         self.mobs.append(BasicMob(name=name))

@@ -25,27 +25,30 @@ import pytest
 
 TEST_DIRECTION = "north"
 OTHER_ROOM_ID = "other room"
+ITEM_ID = "abc123"
 
 
 @pytest.fixture
 def dummy_state():
     state = State()
-
+    item_id = ITEM_ID
+    held_item = HeldItem(item_id=item_id, durability=100)  # these ids are related
     state.rooms[CLONING_TUBE_ID] = Room(
         name="Cloning tube",
         desc="You are in a cloning tube\n",
         actions={TEST_DIRECTION: GoToRoomAction(room_id=OTHER_ROOM_ID)},
+        items=[held_item],
     )
+
     state.rooms[OTHER_ROOM_ID] = Room(
         name="other room",
         desc="a description",
         actions={TEST_DIRECTION: GoToRoomAction(room_id=CLONING_TUBE_ID)},
     )
-    item_id = "abc123"
-    held_item = HeldItem(item_id=item_id, durability=100)
+
     layers = Layers(first=held_item, third=held_item)
     item = Combatable(name="helmet", durability=200, Strength=4)
-    state.items[item_id] = item
+    state.items[item_id] = item  # these ids are related
     character = Character(
         Strength=1,
         Dexterity=2,
@@ -261,6 +264,26 @@ def test__state__delete_room(dummy_state):
     assert len(dummy_state.rooms[CLONING_TUBE_ID].actions) == 0
 
 
+def test__state__spawn(dummy_state):
+    dummy_state.room.items == []
+    item = dummy_state.items[ITEM_ID]
+    dummy_state.spawn(ITEM_ID, item)
+    dummy_state.room.items == [HeldItem(item_id=ITEM_ID, durability=item.durability)]
+
+
+def test__state__get__drop(dummy_state):
+    assert len(dummy_state.room.items) == 1
+    assert len(dummy_state.campaign.inventory) == 0
+    assert dummy_state.get("helmet") is True
+    assert dummy_state.get("helmet") is False
+    assert len(dummy_state.room.items) == 0
+    assert len(dummy_state.campaign.inventory) == 1
+    assert dummy_state.drop("helmet") is True
+    assert dummy_state.drop("helmet") is False
+    assert len(dummy_state.room.items) == 1
+    assert len(dummy_state.campaign.inventory) == 0
+
+
 def test__state__get_score(dummy_state):
     score = dummy_state.get_score()
     assert score == "\n".join(
@@ -296,9 +319,18 @@ def test__state__makeroom(dummy_state):
     assert room_id == dummy_state.room.actions[direction].room_id
 
 
+def test__state__make__doesnt_make_anything(dummy_state):
+    assert dummy_state.make("wrongtype") is False
+
+
+def test__state__make__makes_an_armor(dummy_state):
+    do_fill = False
+    item_id = dummy_state.make("armor", do_fill)
+    assert item_id in dummy_state.items
+
+
 def test__state__show_equipment(dummy_state):
     equipment = dummy_state.show_equipment()
-    print(equipment)
     assert (
         equipment
         == """Name: TESTNAME

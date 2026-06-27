@@ -40,7 +40,7 @@
         }
       ],
       "name": "Campaign 1",
-      "room_id": "vnum0",
+      "room_id": "f00a3557-cb49-4b9e-a9cc-5a35d7fb5fe0",
       "character_count": 2,
       "flags": {
         "got_item": true
@@ -48,38 +48,11 @@
       "inventory": [
         {
           "item_id": "stuff",
-          "durability": 500,
-          "nprop": 123
+          "durability": 500
         },
         {
           "item_id": "stuff",
-          "durability": 500,
-          "nprop": 123
-        },
-        {
-          "item_id": "stuff",
-          "durability": 500,
-          "nprop": 123
-        },
-        {
-          "item_id": "stuff",
-          "durability": 500,
-          "nprop": 123
-        },
-        {
-          "item_id": "stuff",
-          "durability": 500,
-          "nprop": 123
-        },
-        {
-          "item_id": "stuff",
-          "durability": 500,
-          "nprop": 123
-        },
-        {
-          "item_id": "",
-          "durability": 500,
-          "nprop": 123
+          "durability": 500
         }
       ]
     },
@@ -113,8 +86,7 @@
       "inventory": [
         {
           "item_id": "stuff",
-          "durability": 500,
-          "nprop": 123
+          "durability": 500
         }
       ]
     }
@@ -129,18 +101,7 @@
           "room_id": "f00a3557-cb49-4b9e-a9cc-5a35d7fb5fe0"
         }
       },
-      "items": [
-        {
-          "item_id": "stuff",
-          "durability": 500,
-          "nprop": 123
-        },
-        {
-          "item_id": "stuff",
-          "durability": 500,
-          "nprop": 123
-        }
-      ]
+      "items": []
     },
     "f00a3557-cb49-4b9e-a9cc-5a35d7fb5fe0": {
       "name": "hallway",
@@ -168,6 +129,20 @@
       "name": "somethingname",
       "value": 0,
       "durability": 500,
+      "type": "Weapon"
+    },
+    "2f3af7da-1261-49e7-aca0-79dc522cd772": {
+      "Strength": 0,
+      "Dexterity": 0,
+      "Wisdom": 0,
+      "Intelligence": 0,
+      "Constitution": 0,
+      "hitroll": 3,
+      "damageroll": 3,
+      "armor": 0,
+      "name": "thing",
+      "value": 30,
+      "durability": 3,
       "type": "Weapon"
     }
   },

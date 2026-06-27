@@ -1,7 +1,7 @@
-from src.models import State, MobConversation, HeldItem
+from src.models import State, MobConversation, HeldItem, Armor, Weapon
 from typing import Callable
 import textwrap
-from src.utility import get_choice
+from src.utility import get_choice, generate_id
 
 
 DO_NOT_PRINT = 1
@@ -164,8 +164,16 @@ def equipment(arguments: CommandArguments):
 def inventory(arguments: CommandArguments):
     print("Inventory:")
     items = arguments.state.campaign.inventory
-    for item in items:
-        print(item)
+    for held_item in items:
+        item = arguments.state.get_item_by_id(held_item.item_id)
+        print(item.name)
+    return DO_NOT_PRINT
+
+
+def make(arguments: CommandArguments):
+    type = arguments.argv[0].lower()
+    if not arguments.state.make(type):
+        print(f"{type} not allowed")
     return DO_NOT_PRINT
 
 
@@ -186,6 +194,28 @@ def spawn(arguments: CommandArguments):
     if choice < len(items):
         (item_id, item) = items[choice]
         arguments.state.spawn(item_id, item)
+
+
+def destroy(arguments: CommandArguments):
+    item_input = " ".join(arguments.argv)
+    for held_item in arguments.state.room.items:
+        item = arguments.state.get_item_by_id(held_item.item_id)
+        if item_input == item.name:
+            arguments.state.room.items.remove(item)
+
+
+def drop(arguments: CommandArguments):
+    item_input = " ".join(arguments.argv).lower()
+    if not arguments.state.drop(item_input):
+        print("You don't have that item")
+        return DO_NOT_PRINT
+
+
+def get(arguments: CommandArguments):
+    item_input = " ".join(arguments.argv)
+    if not arguments.state.get(item_input):
+        print("That item is not here")
+        return DO_NOT_PRINT
 
 
 commands = dict(
@@ -240,6 +270,9 @@ commands = dict(
                 spawn,
                 description="spawn item into room",
             ),
+            "make": Command(make, description="make things", args=["<type>"]),
+            "get": Command(get, description="picks up item", args=["<item>"]),
+            "drop": Command(drop, description="drops item", args=["<item>"]),
         }.items()
     )
 )

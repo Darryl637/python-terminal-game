@@ -88,61 +88,18 @@ class Game:
                             print(f"{mob.name} is in the room")
                             break
 
-                for item in room.items:
-                    print(item)
+                for held_item in room.items:
+                    item = self.state.get_item_by_id(held_item.item_id)
+                    print(Fore.GREEN + item.name)
             needsprompt = True
 
             line = get_line(">")
 
-            match line:
-                case s if s.startswith("make "):
-                    command, type = s.lower().split()
-                    match type:
-                        case "armor":
-                            item = Armor()
-
-                        case "weapon":
-                            item = Weapon()
-
-                    item.fill()
-                    item_id = generate_id()
-                    self.state.items[item_id] = item
-
-                    needsprompt = False
-
-                case g if g.startswith("get "):
-                    command, *item_input = g.split()
-                    item_input = " ".join(item_input).lower()
-                    found = False
-                    for index, item in enumerate(room.items):
-                        if item_input == item:
-                            self.state.campaign.inventory.append(item)
-                            room.items.pop(index)
-                            found = True
-                            break
-                    if not found:
-                        print("That item isn't here")
-
-                case d if d.startswith("drop "):
-                    command, *item_input = d.split()
-                    item_input = " ".join(item_input).lower()
-                    found = False
-                    for index, item in enumerate(self.state.campaign.inventory):
-                        if item_input == item:
-                            room.items.append(item)
-                            self.state.campaign.inventory.pop(index)
-                            found = True
-                            needsprompt = False
-                            break
-                    if not found:
-                        print("You don't have that item")
-
-                case _:
-                    result = run_command(state=self.state, line=line)
-                    if result == DO_NOT_PRINT:
-                        needsprompt = False
-                    if result == QUIT:
-                        break
+            result = run_command(state=self.state, line=line)
+            if result == DO_NOT_PRINT:
+                needsprompt = False
+            if result == QUIT:
+                break
 
             self.save_state()
 
