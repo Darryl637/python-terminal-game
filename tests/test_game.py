@@ -320,13 +320,19 @@ def test__state__makeroom(dummy_state):
 
 
 def test__state__make__doesnt_make_anything(dummy_state):
-    assert dummy_state.make("wrongtype") is False
+    assert dummy_state.make("wrongtype")[0] is None
 
 
 def test__state__make__makes_an_armor(dummy_state):
     do_fill = False
-    item_id = dummy_state.make("armor", do_fill)
-    assert item_id in dummy_state.items
+    (item_id, item) = dummy_state.make("armor", do_fill)
+    assert dummy_state.items[item_id] == item
+
+
+def test__state__make__makes_an_weapon(dummy_state):
+    do_fill = False
+    (item_id, item) = dummy_state.make("weapon", do_fill)
+    assert dummy_state.items[item_id] == item
 
 
 def test__state__show_equipment(dummy_state):

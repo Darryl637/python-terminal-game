@@ -258,12 +258,15 @@ class State(BaseModel):
                 item = Weapon()
 
             case _:
-                return False
+                return (None, None)
         if do_fill:
             item.fill()
         item_id = generate_id()
         self.items[item_id] = item
-        return item_id
+        return (
+            item_id,
+            item,
+        )  # update test for make to work with key and value being returned. check that the item is at that key in dict not just within dict
 
     def make_mob(self, name):
         self.mobs.append(BasicMob(name=name))
