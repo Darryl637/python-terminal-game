@@ -40,12 +40,16 @@
         }
       ],
       "name": "Campaign 1",
-      "room_id": "f00a3557-cb49-4b9e-a9cc-5a35d7fb5fe0",
+      "room_id": "vnum0",
       "character_count": 2,
       "flags": {
         "got_item": true
       },
       "inventory": [
+        {
+          "item_id": "a00abe0b-6132-4bb6-8b9d-a8ef95779260",
+          "durability": 20
+        },
         {
           "item_id": "stuff",
           "durability": 500
@@ -54,7 +58,8 @@
           "item_id": "stuff",
           "durability": 500
         }
-      ]
+      ],
+      "gold": 45
     },
     {
       "characters": [
@@ -88,7 +93,8 @@
           "item_id": "stuff",
           "durability": 500
         }
-      ]
+      ],
+      "gold": 100
     }
   ],
   "rooms": {
@@ -127,7 +133,7 @@
       "damageroll": 0,
       "armor": 0,
       "name": "somethingname",
-      "value": 0,
+      "value": 10,
       "durability": 500,
       "type": "Weapon"
     },
@@ -144,6 +150,22 @@
       "value": 30,
       "durability": 3,
       "type": "Weapon"
+    },
+    "a00abe0b-6132-4bb6-8b9d-a8ef95779260": {
+      "Strength": 0,
+      "Dexterity": 0,
+      "Wisdom": 0,
+      "Intelligence": 0,
+      "Constitution": 0,
+      "hitroll": 0,
+      "damageroll": 0,
+      "armor": 10,
+      "name": "pants",
+      "value": 100,
+      "durability": 20,
+      "wear_location": "legs",
+      "type": "Armor",
+      "layer_loc": "first"
     }
   },
   "mobs": [
@@ -173,24 +195,19 @@
           "set_flags": {},
           "visible_flags": {}
         }
-      ]
+      ],
+      "stock": []
     },
     {
-      "name": "c3pq",
+      "name": "store",
       "locations": [
         {
           "room_id": "vnum0"
         }
       ],
-      "conversations": [
-        {
-          "text": "hello\\",
-          "item_ids": [
-            ""
-          ],
-          "set_flags": {},
-          "visible_flags": {}
-        }
+      "conversations": [],
+      "stock": [
+        "stuff"
       ]
     }
   ]

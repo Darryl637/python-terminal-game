@@ -61,6 +61,7 @@ class Campaign(BaseModel):
     character_count: int = 0
     flags: dict[str, bool] = {}
     inventory: List[HeldItem] = []
+    gold: int = 100
 
 
 class ItemBase(BaseModel):
@@ -160,7 +161,7 @@ class MobConversation(BaseModel):
     text: str = ""
     item_ids: list[str] = []
     set_flags: dict[str, bool] = {}
-    visible_flags: dict[str, bool] = {}
+    visible_flags: dict[str, bool] = {}  # {"flag visible": False}
 
     def fill(self):
         set_state_with_line(self, "text", "what do you want them to say")
@@ -177,6 +178,11 @@ class BasicMob(BaseModel):
     name: str
     locations: List[MobLocation] = []
     conversations: List[MobConversation] = []
+    stock: List[str] = []
+
+    @property
+    def is_shop(self):
+        return self.stock
 
 
 def mob_location_room(room_id: str):
@@ -192,7 +198,7 @@ class State(BaseModel):
         ROOMS  # "Room" the quotes are saying to wait until file is loaded
     )
     campaign_index: int = -1
-    items: dict[str, Item] = {"stuff": Weapon()}
+    items: dict[str, Item] = {"stuff": Weapon(name="sheild")}
     # makemob <name>
     # makemob addlocation <mobname> <room_id>
     # makemob <name> add_conversation
@@ -211,7 +217,10 @@ class State(BaseModel):
                     text="Move along I'm busy",
                 ),
             ],
-        )
+        ),
+        BasicMob(
+            name="store", locations=[MobLocation(room_id="vnum0")], stock=["stuff"]
+        ),
     ]
 
     @property
@@ -226,6 +235,43 @@ class State(BaseModel):
     @property
     def characters(self):
         return self.campaign.characters
+
+    def buy(self, target: str):
+        campaign = self.campaign
+
+        for mob in self.mobs:
+            for location in mob.locations:
+                if location.room_id == campaign.room_id:
+                    if mob.is_shop:
+                        for item_id in mob.stock:
+                            item = self.get_item_by_id(item_id)
+                            cost = item.value
+                            currgold = campaign.gold
+                            if target == item.name and cost <= currgold:
+                                campaign.gold = currgold - cost
+                                held_item = HeldItem(
+                                    item_id=item_id, durability=item.durability
+                                )
+                                campaign.inventory.append(held_item)
+                                return True
+        return False
+
+    def sell(self, target: str):
+        campaign = self.campaign
+
+        for mob in self.mobs:
+            for location in mob.locations:
+                if location.room_id == campaign.room_id:
+                    if mob.is_shop:
+                        for held_item in campaign.inventory:
+                            item = self.get_item_by_id(held_item.item_id)
+                            cost = item.value
+                            currgold = campaign.gold
+                            if target == item.name:
+                                campaign.gold = currgold + int(cost * 0.5)
+                                campaign.inventory.remove(held_item)
+                                return True
+        return False
 
     def get_item_by_id(self, id: str):
         return self.items[id]
@@ -249,7 +295,7 @@ class State(BaseModel):
                 return True
         return False
 
-    def make(self, type, do_fill=True):
+    def make(self, type: Union[Literal["weapon"], Literal["armor"]], do_fill=True):
         match type:
             case "armor":
                 item = Armor()

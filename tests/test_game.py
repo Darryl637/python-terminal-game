@@ -19,6 +19,9 @@ from src.models import (
     HeldItem,
     Armor,
     Combatable,
+    MobConversation,
+    BasicMob,
+    MobLocation,
 )
 from unittest import mock
 import pytest
@@ -47,7 +50,7 @@ def dummy_state():
     )
 
     layers = Layers(first=held_item, third=held_item)
-    item = Combatable(name="helmet", durability=200, Strength=4)
+    item = Combatable(name="helmet", durability=200, Strength=4, value=15)
     state.items[item_id] = item  # these ids are related
     character = Character(
         Strength=1,
@@ -65,11 +68,12 @@ def dummy_state():
     )
 
     state.campaigns.append(
-        Campaign(
-            room_id=CLONING_TUBE_ID,
-            characters=[character, character],
-        )
+        Campaign(room_id=CLONING_TUBE_ID, characters=[character, character], gold=20)
     )
+    mob = BasicMob(
+        name="store", stock=[ITEM_ID], locations=[MobLocation(room_id="vnum0")]
+    )
+    state.mobs.append(mob)
     return state
 
 
@@ -157,6 +161,33 @@ def test__set_state_with_line__stores_line():
         skip_if_has_value = False
         set_state_with_line(d, path, prompt, skip_if_has_value)
         assert d.zaboomafom == user_input
+
+
+def test__mob_conversation_fill():
+    text = "Testing conversation"
+    item_id = "conversation id"
+    set_flags = {"healing": True}
+    visible_flags = {"flag visible": False}
+    conversation = MobConversation()
+    with mock.patch(
+        "builtins.input",
+        side_effect=[
+            text,
+            item_id,
+            "",
+            "healing",
+            "on",
+            "",
+            "flag visible",
+            "noton",
+            "",  #
+        ],
+    ):
+        conversation.fill()
+        assert conversation.text == text
+        assert conversation.item_ids == [item_id]
+        assert conversation.set_flags == set_flags
+        assert conversation.visible_flags == visible_flags
 
 
 # Itembase
@@ -309,6 +340,18 @@ def test__state__get_score(dummy_state):
             "arm: 8|8",
         ]
     )
+
+
+def test__state__buy(dummy_state):
+    name = "helmet"
+    item_count = len(dummy_state.campaign.inventory)
+    assert dummy_state.campaign.gold == 20
+    assert dummy_state.buy(name) is True
+    assert len(dummy_state.campaign.inventory) == item_count + 1
+    assert dummy_state.campaign.gold == 5
+    assert dummy_state.buy(name) is False
+    assert len(dummy_state.campaign.inventory) == item_count + 1
+    assert dummy_state.campaign.gold == 5
 
 
 def test__state__makeroom(dummy_state):

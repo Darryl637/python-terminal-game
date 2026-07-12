@@ -218,6 +218,36 @@ def get(arguments: CommandArguments):
         return DO_NOT_PRINT
 
 
+def showstock(arguments: CommandArguments):
+    for mob in arguments.state.mobs:
+        for location in mob.locations:
+            if location.room_id == arguments.state.campaign.room_id:
+                for stock in mob.stock:
+                    item = arguments.state.get_item_by_id(stock)
+                    print(item.name, item.value)
+    return DO_NOT_PRINT
+
+
+def buy(arguments: CommandArguments):
+    target = arguments.argv[0]
+
+    if arguments.state.buy(target):
+        print("Purchase successful")
+    else:
+        print("Purchase failed")
+    return DO_NOT_PRINT
+
+
+def sell(arguments: CommandArguments):
+    target = arguments.argv[0]
+
+    if arguments.state.sell(target):
+        print("Sale successful")
+    else:
+        print("Sale failed")
+    return DO_NOT_PRINT
+
+
 commands = dict(
     sorted(
         {
@@ -273,6 +303,9 @@ commands = dict(
             "make": Command(make, description="make things", args=["<type>"]),
             "get": Command(get, description="picks up item", args=["<item>"]),
             "drop": Command(drop, description="drops item", args=["<item>"]),
+            "list": Command(showstock, description="shows stores inventory"),
+            "buy": Command(buy, description="purchase item", args=["<item>"]),
+            "sell": Command(sell, description="sell item", args=["<item>"]),
         }.items()
     )
 )

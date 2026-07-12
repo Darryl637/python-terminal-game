@@ -67,21 +67,22 @@ def set_state_with_list(instance: Any, path: str, prompt: str, skip_if_has_value
         return
     line = True
     print(prompt)
-    list = []
+    list = []  # [conversation id]
     while line:
-        line = input()
-        list.append(line)
+        line = input()  #
+        if line:
+            list.append(line)
     setattr(instance, path, list)
 
 
 def set_state_with_dict(instance: Any, path: str, prompt: str, skip_if_has_value=False):
-    value = getattr(instance, path)
-    if skip_if_has_value and value:
+    existing_value = getattr(instance, path)
+    if skip_if_has_value and existing_value:
         return
     print(prompt)
-    dict = {}
+    dict = {}  # {"flag visible": False}
     while True:
-        key = input()
+        key = input()  # "flag visible"
         if not key:
             break
         value = input().lower() == "on"
