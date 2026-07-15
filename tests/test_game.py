@@ -68,7 +68,12 @@ def dummy_state():
     )
 
     state.campaigns.append(
-        Campaign(room_id=CLONING_TUBE_ID, characters=[character, character], gold=20)
+        Campaign(
+            room_id=CLONING_TUBE_ID,
+            characters=[character, character],
+            gold=20,
+            inventory=[],
+        )
     )
     mob = BasicMob(
         name="store", stock=[ITEM_ID], locations=[MobLocation(room_id="vnum0")]
@@ -352,6 +357,15 @@ def test__state__buy(dummy_state):
     assert dummy_state.buy(name) is False
     assert len(dummy_state.campaign.inventory) == item_count + 1
     assert dummy_state.campaign.gold == 5
+
+
+def test__state__sell(dummy_state):
+    name = "helmet"
+    item_count = len(dummy_state.campaign.inventory)
+    assert dummy_state.campaign.gold == 20
+    assert dummy_state.sell(name) is True
+    assert len(dummy_state.campaign.inventory) == item_count - 1
+    assert dummy_state.campaign.gold == 27
 
 
 def test__state__makeroom(dummy_state):

@@ -40,7 +40,7 @@
         }
       ],
       "name": "Campaign 1",
-      "room_id": "vnum0",
+      "room_id": "bb988e81-b58c-409c-a35e-787b73017a2f",
       "character_count": 2,
       "flags": {
         "got_item": true
@@ -99,21 +99,81 @@
   ],
   "rooms": {
     "vnum0": {
-      "name": "Cloning tube",
-      "desc": "stuff\n\nmore stuff",
+      "name": "Coruscant Galactic Academy - Grand Atrium",
+      "desc": "Sunlight pours through towering transparisteel windows into the Grand Atrium of\nthe Coruscant Galactic Academy. Students and instructors from across the galaxy\nmove between halls leading to classrooms, simulators, and training facilities.\nHolographic directories hover above the polished floor, guiding newcomers to\ntheir destinations. The air hums with anticipation as every journey begins\nwithin these walls.",
       "actions": {
         "north": {
           "action": "gotoroom",
           "room_id": "f00a3557-cb49-4b9e-a9cc-5a35d7fb5fe0"
+        },
+        "south": {
+          "action": "gotoroom",
+          "room_id": "bb988e81-b58c-409c-a35e-787b73017a2f"
+        },
+        "up": {
+          "action": "gotoroom",
+          "room_id": "537e52ef-4cbd-44ff-ad32-fdc2429183c8"
+        },
+        "east": {
+          "action": "gotoroom",
+          "room_id": "ad3e950d-1cf5-4d92-ae4e-bd61e5713093"
+        },
+        "west": {
+          "action": "gotoroom",
+          "room_id": "12612dd2-13fc-40bb-a988-6ac9d50f6b93"
         }
       },
       "items": []
     },
     "f00a3557-cb49-4b9e-a9cc-5a35d7fb5fe0": {
-      "name": "hallway",
-      "desc": "",
+      "name": "Coruscant Galactic Academy - Cafeteria",
+      "desc": "Long rows of tables fill the Academy Cafeteria as students and instructors pause\nbetween lessons to share meals and conversation. The aroma of freshly prepared\nfood drifts from serving stations where droids work tirelessly to keep hungry\nrecruits fed. Laughter, friendly debate, and the occasional boast about\nsimulator scores create a welcome contrast to the disciplined atmosphere found\nelsewhere in the Academy.",
       "actions": {
         "south": {
+          "action": "gotoroom",
+          "room_id": "vnum0"
+        }
+      },
+      "items": []
+    },
+    "bb988e81-b58c-409c-a35e-787b73017a2f": {
+      "name": "Coruscant Galactic Academy - Entrance Plaza",
+      "desc": "A broad plaza stretches before the Academy, its polished stone alive with the\nfootsteps of students, travelers, and instructors. Speeders weave through the\ntraffic lanes high overhead while distant city sounds echo between towering\nskyscrapers. The Academy's towering entrance stands to the north, welcoming\nthose eager to begin their journey, while the streets of Coruscant continue\nsouth into the heart of the endless city.",
+      "actions": {
+        "north": {
+          "action": "gotoroom",
+          "room_id": "vnum0"
+        }
+      },
+      "items": []
+    },
+    "537e52ef-4cbd-44ff-ad32-fdc2429183c8": {
+      "name": "Coruscant Galactic Academy - Flight Simulator",
+      "desc": "Rows of advanced flight simulators line the expansive training hall, each\nprojecting holographic starfields and distant worlds. Cadets practice takeoffs,\ndocking maneuvers, and hyperspace navigation under the watchful eyes of\nexperienced instructors. The steady hum of engines and computer systems fills\nthe room, reminding every recruit that mastering a starship is the first step\ntoward exploring the galaxy.",
+      "actions": {
+        "down": {
+          "action": "gotoroom",
+          "room_id": "vnum0"
+        }
+      },
+      "items": []
+    },
+    "ad3e950d-1cf5-4d92-ae4e-bd61e5713093": {
+      "name": "Coruscant Galactic Academy - Engineering Lab",
+      "desc": "Workbenches filled with tools, circuit boards, and dismantled droids line the\nwalls of the Engineering Lab. Students carefully assemble components while\ninstructors demonstrate the principles of repair, fabrication, and maintenance.\nThe occasional burst of sparks and the whir of diagnostic equipment fill the\nair, reminding every recruit that a skilled engineer can keep both machines and\nstarships running when it matters most.",
+      "actions": {
+        "west": {
+          "action": "gotoroom",
+          "room_id": "vnum0"
+        }
+      },
+      "items": []
+    },
+    "12612dd2-13fc-40bb-a988-6ac9d50f6b93": {
+      "name": "Coruscant Galactic Academy - Combat Annex",
+      "desc": "Reinforced walls and padded training areas fill the Combat Annex, where recruits\nhone their skills in controlled exercises. Practice remotes drift through the\nroom while training droids spar with cadets under the supervision of seasoned\ninstructors. The sharp crack of stun bolts and the clash of practice weapons\necho through the hall, reminding every student that discipline and preparation\nare as valuable as strength in battle.",
+      "actions": {
+        "east": {
           "action": "gotoroom",
           "room_id": "vnum0"
         }
