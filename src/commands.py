@@ -1,7 +1,15 @@
 from src.models import State, MobConversation, HeldItem, Armor, Weapon
 from typing import Callable
 import textwrap
-from src.utility import get_choice, generate_id
+from src.utility import (
+    get_choice,
+    generate_id,
+    get_line,
+    get_number,
+    is_non_negative,
+    is_positive,
+)
+import asyncio
 
 
 DO_NOT_PRINT = 1
@@ -191,7 +199,7 @@ def spawn(arguments: CommandArguments):
         [*item_names, "Nevermind"],
         returns_index=True,
     )
-    if choice < len(items):
+    if isinstance(choice, int) and choice < len(items):
         (item_id, item) = items[choice]
         arguments.state.spawn(item_id, item)
 
@@ -246,6 +254,18 @@ def sell(arguments: CommandArguments):
     else:
         print("Sale failed")
     return DO_NOT_PRINT
+
+
+def roomeffect(arguments: CommandArguments):
+    choice = get_choice("add which effect to this room", ["healing", "damaging"])
+    prompt = "heal amount?" if choice == "healing" else "damaging amount?"
+    hpgain = get_number(prompt, is_non_negative)
+    if choice == "damaging":
+        hpgain = -hpgain
+    hptime = get_number("how often in seconds", is_positive)
+    curroom = arguments.state.room
+    curroom.hpgain = hpgain
+    curroom.hptime = hptime
 
 
 commands = dict(
@@ -306,6 +326,7 @@ commands = dict(
             "list": Command(showstock, description="shows stores inventory"),
             "buy": Command(buy, description="purchase item", args=["<item>"]),
             "sell": Command(sell, description="sell item", args=["<item>"]),
+            "roomeffect": Command(roomeffect, description="adds effect to room"),
         }.items()
     )
 )

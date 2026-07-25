@@ -1,6 +1,7 @@
 import uuid
 from typing import TypeVar, List, Callable, Any, TYPE_CHECKING
 from src.constants import STATS
+import asyncio
 
 if TYPE_CHECKING:
     from src.models import Statistics
@@ -39,11 +40,11 @@ def add_stats(destination: dict[str, int], source: "Statistics"):
         destination[stat] = destination_value + source_value
 
 
-def get_number(prompt: str, validator: Callable[[int], bool] = is_valid) -> int:
+async def get_number(prompt: str, validator: Callable[[int], bool] = is_valid) -> int:
     while True:
         print(prompt)
         try:
-            number = int(input())
+            number = int(await async_input())
             if validator(number):
                 return number
         except KeyboardInterrupt:
@@ -61,36 +62,40 @@ def set_state_with_line(instance: Any, path: str, prompt: str, skip_if_has_value
     setattr(instance, path, get_line(prompt))
 
 
-def set_state_with_list(instance: Any, path: str, prompt: str, skip_if_has_value=False):
+async def set_state_with_list(
+    instance: Any, path: str, prompt: str, skip_if_has_value=False
+):
     value = getattr(instance, path)
     if skip_if_has_value and value:
         return
-    line = True
+    line = " "
     print(prompt)
     list = []  # [conversation id]
     while line:
-        line = input()  #
+        line = await async_input()  #
         if line:
             list.append(line)
     setattr(instance, path, list)
 
 
-def set_state_with_dict(instance: Any, path: str, prompt: str, skip_if_has_value=False):
+async def set_state_with_dict(
+    instance: Any, path: str, prompt: str, skip_if_has_value=False
+):
     existing_value = getattr(instance, path)
     if skip_if_has_value and existing_value:
         return
     print(prompt)
     dict = {}  # {"flag visible": False}
     while True:
-        key = input()  # "flag visible"
+        key = await async_input()  # "flag visible"
         if not key:
             break
-        value = input().lower() == "on"
+        value = await async_input().lower() == "on"
         dict[key] = value
     setattr(instance, path, dict)
 
 
-def set_state_with_number(
+async def set_state_with_number(
     instance: Any,
     path: str,
     prompt: str,
@@ -100,7 +105,7 @@ def set_state_with_number(
     value = getattr(instance, path)
     if skip_if_has_value and value:
         return
-    setattr(instance, path, get_number(prompt, validator))
+    setattr(instance, path, await get_number(prompt, validator))
 
 
 # possible not needed now
@@ -117,12 +122,17 @@ def set_state_with_choice(
     setattr(instance, path, get_choice(prompt, options))
 
 
-def get_line(prompt: str):
+async def async_input(prompt: str = "") -> str:
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(None, input, prompt)
 
-    return input(prompt + "\n")
+
+async def get_line(prompt: str):
+
+    return await async_input(prompt + "\n")
 
 
-def get_choice(
+async def get_choice(
     prompt: str, options: List[str], returns_index=False, allows_free_form=False
 ) -> str | int:
     while True:
@@ -130,9 +140,9 @@ def get_choice(
             print(prompt)
             for index, option in enumerate(options):
                 print(f"{index + 1}. {option}")
-            value = input()
+            value = await async_input()
             number = int(value) - 1
-            if 0 <= number and number < len(options):
+            if 0 <= number < len(options):
                 if returns_index:
                     return number
                 return options[number]

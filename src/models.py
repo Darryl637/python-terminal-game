@@ -14,6 +14,7 @@ from src.utility import (
     set_state_with_list,
     set_state_with_dict,
 )
+from datetime import datetime, time
 
 
 class HeldItem(BaseModel):
@@ -38,9 +39,11 @@ class Statistics(BaseModel):
     hitroll: int = 0
     damageroll: int = 0
     armor: int = 0
+    Hp: int = 500
 
 
 class Character(Statistics):
+    max: Statistics = Statistics()
     name: str = ""
     head: List[
         Layers
@@ -62,6 +65,7 @@ class Campaign(BaseModel):
     flags: dict[str, bool] = {}
     inventory: List[HeldItem] = []
     gold: int = 100
+    lastupdate: datetime = datetime.now()
 
 
 class ItemBase(BaseModel):
@@ -120,6 +124,7 @@ class Weapon(Combatable):
 
 
 Item = Union[Armor, Weapon]
+ItemType = Union[Literal["weapon"], Literal["armor"]]
 
 
 class GoToRoomAction(BaseModel):
@@ -135,6 +140,8 @@ class Room(BaseModel):
     desc: str = ""
     actions: dict[str, Action] = {}
     items: List[HeldItem] = []
+    hpgain: int = 0
+    hptime: int = 0
 
 
 CLONING_TUBE_ID = "vnum0"
@@ -295,7 +302,13 @@ class State(BaseModel):
                 return True
         return False
 
-    def make(self, type: Union[Literal["weapon"], Literal["armor"]], do_fill=True):
+    def make(
+        # dont format
+        self,
+        type: str,
+        do_fill=True,
+    ):
+        item: Item | None = None
         match type:
             case "armor":
                 item = Armor()
@@ -353,7 +366,7 @@ class State(BaseModel):
         return conversation.text
 
     def calculate_score(self, character: Character):
-        stats = {}
+        stats: dict[str, int] = {}
         add_stats(stats, character)
         for wear_location in wear_locations:
             for layer in getattr(character, wear_location):
@@ -426,12 +439,12 @@ class State(BaseModel):
         held_item.durability = item.durability
         self.room.items.append(held_item)
 
-    def choose_campaign(self):
+    async def choose_campaign(self):
         campaigns = self.campaigns or []
         options = ["New Game"]
         for campaign in campaigns:
             options.append(campaign.name)
-        option = get_choice("Choose your campaign: ", options, True)
+        option = await get_choice("Choose your campaign: ", options, True)
         if option == NEW_GAME:
             campaign = Campaign(name="Campaign " + str(option + len(options)))
             campaigns.append(campaign)

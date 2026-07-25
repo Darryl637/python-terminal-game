@@ -24,7 +24,8 @@ from src.utility import (
 )
 from src.commands import run_command, DO_NOT_PRINT, QUIT
 
-import hmr
+import hmr  # type: ignore[import-untyped]
+import asyncio
 
 run_command = hmr.reload(run_command)
 
@@ -45,10 +46,10 @@ class Game:
         return ""
 
     # make rooms save to json upon making room
-    def start(self):
-        self.state.choose_campaign()  # -> magic -> function
+    async def start(self):
+        await self.state.choose_campaign()  # -> magic -> function
         self.save_state()
-        set_state_with_number(
+        await set_state_with_number(
             self.state.campaign,
             "character_count",
             "How many characters are in your campaign? (1-4)",
@@ -91,9 +92,12 @@ class Game:
                 for held_item in room.items:
                     item = self.state.get_item_by_id(held_item.item_id)
                     print(Fore.GREEN + item.name)
+                print(
+                    f"\n<Hp:{self.state.campaign.characters[0].Hp}/{self.state.campaign.characters[0].max.Hp}>-<Cr:{self.state.campaign.gold}>"
+                )
             needsprompt = True
 
-            line = get_line(">")
+            line = await get_line(">")
 
             result = run_command(state=self.state, line=line)
             if result == DO_NOT_PRINT:
@@ -117,7 +121,7 @@ class Game:
         set_state_with_line(character, "name", "What is your characters name?", True)
         self.save_state()
         character_name = character.name
-        stat_pool = 75
+        stat_pool = 575
         for stat in ROLLED_STATS:
             already_allocated_stat = getattr(character, stat) or 0
             stat_pool = stat_pool - already_allocated_stat
@@ -136,6 +140,7 @@ class Game:
                     already_allocated_stat = getattr(character, stat) or 0
                     stat_pool = stat_pool - value
                     setattr(character, stat, value + already_allocated_stat)
+                    setattr(character.max, stat, value + already_allocated_stat)
                     self.save_state()
 
     def save_state(self):

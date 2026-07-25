@@ -357,15 +357,21 @@ def test__state__buy(dummy_state):
     assert dummy_state.buy(name) is False
     assert len(dummy_state.campaign.inventory) == item_count + 1
     assert dummy_state.campaign.gold == 5
-
-
-def test__state__sell(dummy_state):
-    name = "helmet"
-    item_count = len(dummy_state.campaign.inventory)
-    assert dummy_state.campaign.gold == 20
     assert dummy_state.sell(name) is True
-    assert len(dummy_state.campaign.inventory) == item_count - 1
-    assert dummy_state.campaign.gold == 27
+    assert len(dummy_state.campaign.inventory) == item_count
+    assert dummy_state.campaign.gold == 12
+    assert dummy_state.sell(name) is False
+    assert len(dummy_state.campaign.inventory) == item_count
+    assert dummy_state.campaign.gold == 12
+
+
+def test__state__say(dummy_state):
+    assert dummy_state.campaign.inventory == []
+    assert dummy_state.say("droid") == "have you seen these jedi"
+    assert dummy_state.campaign.inventory == [HeldItem(item_id="stuff", durability=500)]
+    assert dummy_state.say("droid") == "Move along I'm busy"
+    assert dummy_state.campaign.inventory == [HeldItem(item_id="stuff", durability=500)]
+    assert dummy_state.say("store") == "They have nothing to say"
 
 
 def test__state__makeroom(dummy_state):

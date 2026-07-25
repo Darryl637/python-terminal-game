@@ -11,6 +11,18 @@
           "hitroll": 0,
           "damageroll": 0,
           "armor": 0,
+          "Hp": 500,
+          "max": {
+            "Strength": 0,
+            "Dexterity": 0,
+            "Wisdom": 0,
+            "Intelligence": 0,
+            "Constitution": 0,
+            "hitroll": 0,
+            "damageroll": 0,
+            "armor": 0,
+            "Hp": 500
+          },
           "name": "bob",
           "head": [],
           "torso": [],
@@ -29,6 +41,18 @@
           "hitroll": 0,
           "damageroll": 0,
           "armor": 0,
+          "Hp": 500,
+          "max": {
+            "Strength": 0,
+            "Dexterity": 0,
+            "Wisdom": 0,
+            "Intelligence": 0,
+            "Constitution": 0,
+            "hitroll": 0,
+            "damageroll": 0,
+            "armor": 0,
+            "Hp": 500
+          },
           "name": "hdid",
           "head": [],
           "torso": [],
@@ -40,26 +64,27 @@
         }
       ],
       "name": "Campaign 1",
-      "room_id": "bb988e81-b58c-409c-a35e-787b73017a2f",
+      "room_id": "3762d5f0-f03f-4651-a5ac-71b96d6e9b21",
       "character_count": 2,
       "flags": {
         "got_item": true
       },
       "inventory": [
         {
+          "item_id": "stuff",
+          "durability": 500
+        },
+        {
+          "item_id": "stuff",
+          "durability": 500
+        },
+        {
           "item_id": "a00abe0b-6132-4bb6-8b9d-a8ef95779260",
           "durability": 20
-        },
-        {
-          "item_id": "stuff",
-          "durability": 500
-        },
-        {
-          "item_id": "stuff",
-          "durability": 500
         }
       ],
-      "gold": 45
+      "gold": 45,
+      "lastupdate": "2026-07-25T08:09:46.686641"
     },
     {
       "characters": [
@@ -72,6 +97,18 @@
           "hitroll": 0,
           "damageroll": 0,
           "armor": 0,
+          "Hp": 500,
+          "max": {
+            "Strength": 0,
+            "Dexterity": 0,
+            "Wisdom": 0,
+            "Intelligence": 0,
+            "Constitution": 0,
+            "hitroll": 0,
+            "damageroll": 0,
+            "armor": 0,
+            "Hp": 500
+          },
           "name": "bob",
           "head": [],
           "torso": [],
@@ -94,7 +131,8 @@
           "durability": 500
         }
       ],
-      "gold": 100
+      "gold": 100,
+      "lastupdate": "2026-07-25T08:09:46.686641"
     }
   ],
   "rooms": {
@@ -123,7 +161,9 @@
           "room_id": "12612dd2-13fc-40bb-a988-6ac9d50f6b93"
         }
       },
-      "items": []
+      "items": [],
+      "hpgain": 0,
+      "hptime": 0
     },
     "f00a3557-cb49-4b9e-a9cc-5a35d7fb5fe0": {
       "name": "Coruscant Galactic Academy - Cafeteria",
@@ -132,9 +172,19 @@
         "south": {
           "action": "gotoroom",
           "room_id": "vnum0"
+        },
+        "northwest": {
+          "action": "gotoroom",
+          "room_id": "05819d12-fcec-4492-a83c-b79b2d646dc6"
+        },
+        "northeast": {
+          "action": "gotoroom",
+          "room_id": "3762d5f0-f03f-4651-a5ac-71b96d6e9b21"
         }
       },
-      "items": []
+      "items": [],
+      "hpgain": 0,
+      "hptime": 0
     },
     "bb988e81-b58c-409c-a35e-787b73017a2f": {
       "name": "Coruscant Galactic Academy - Entrance Plaza",
@@ -145,7 +195,9 @@
           "room_id": "vnum0"
         }
       },
-      "items": []
+      "items": [],
+      "hpgain": 0,
+      "hptime": 0
     },
     "537e52ef-4cbd-44ff-ad32-fdc2429183c8": {
       "name": "Coruscant Galactic Academy - Flight Simulator",
@@ -156,7 +208,9 @@
           "room_id": "vnum0"
         }
       },
-      "items": []
+      "items": [],
+      "hpgain": 0,
+      "hptime": 0
     },
     "ad3e950d-1cf5-4d92-ae4e-bd61e5713093": {
       "name": "Coruscant Galactic Academy - Engineering Lab",
@@ -167,7 +221,9 @@
           "room_id": "vnum0"
         }
       },
-      "items": []
+      "items": [],
+      "hpgain": 0,
+      "hptime": 0
     },
     "12612dd2-13fc-40bb-a988-6ac9d50f6b93": {
       "name": "Coruscant Galactic Academy - Combat Annex",
@@ -178,7 +234,35 @@
           "room_id": "vnum0"
         }
       },
-      "items": []
+      "items": [],
+      "hpgain": 0,
+      "hptime": 0
+    },
+    "05819d12-fcec-4492-a83c-b79b2d646dc6": {
+      "name": "Bacta Tank",
+      "desc": "",
+      "actions": {
+        "southeast": {
+          "action": "gotoroom",
+          "room_id": "f00a3557-cb49-4b9e-a9cc-5a35d7fb5fe0"
+        }
+      },
+      "items": [],
+      "hpgain": 0,
+      "hptime": 0
+    },
+    "3762d5f0-f03f-4651-a5ac-71b96d6e9b21": {
+      "name": "Walk-In Freezer",
+      "desc": "",
+      "actions": {
+        "southwest": {
+          "action": "gotoroom",
+          "room_id": "f00a3557-cb49-4b9e-a9cc-5a35d7fb5fe0"
+        }
+      },
+      "items": [],
+      "hpgain": -1,
+      "hptime": 5
     }
   },
   "campaign_index": 0,
@@ -192,6 +276,7 @@
       "hitroll": 0,
       "damageroll": 0,
       "armor": 0,
+      "Hp": 500,
       "name": "somethingname",
       "value": 10,
       "durability": 500,
@@ -206,6 +291,7 @@
       "hitroll": 3,
       "damageroll": 3,
       "armor": 0,
+      "Hp": 500,
       "name": "thing",
       "value": 30,
       "durability": 3,
@@ -220,6 +306,7 @@
       "hitroll": 0,
       "damageroll": 0,
       "armor": 10,
+      "Hp": 500,
       "name": "pants",
       "value": 100,
       "durability": 20,
