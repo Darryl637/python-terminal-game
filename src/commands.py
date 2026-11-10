@@ -1,16 +1,13 @@
-from src.models import State, MobConversation, HeldItem, Armor, Weapon
-from typing import Callable
+from src.models import State, MobConversation, Item, Armor, Weapon
+from typing import Callable, Awaitable
 import textwrap
 from src.utility import (
-    get_choice,
     generate_id,
-    get_line,
-    get_number,
     is_non_negative,
     is_positive,
 )
 import asyncio
-
+from src.user_io import UserIO
 
 DO_NOT_PRINT = 1
 QUIT = 2
@@ -19,14 +16,16 @@ QUIT = 2
 class CommandArguments:
     state: State
     argv: list[str]
+    user_io: UserIO
 
-    def __init__(self, state, argv):
+    def __init__(self, state, argv, user_io):
         self.state = state
         self.argv = argv
+        self.user_io = user_io
 
 
 class Command:
-    call_back: Callable[[CommandArguments], int]
+    call_back: Callable[[CommandArguments], Awaitable[int]]
     args: list[str]
     description: str
     short_hand: list[str]
@@ -52,12 +51,34 @@ class Command:
         return f"Syntax: {command_name}{args} - {self.description}{short_hand}"
 
 
-def setroomname(arguments: CommandArguments):
+async def boardferry(arguments: CommandArguments):
+    name = " ".join(command.args)
+    transport = next(
+        (
+            transport
+            for transport in arguments.state.transports
+            if transport.rooms[transport.room_index].landing_room_id
+            == arguments.state.campaign.room_id
+            and transport.is_docked
+            and name in transport.name
+        ),
+        None,
+    )
+    if transport:
+        arguments.state.campaign.transport_id = transport.id
+        # when unboarding you should end up in the location the bus is in. unboard only if the bus is stoped and you are on a bus.
+        # set character location to be bus location on unboard
+        # dont update everytime the bus moved only when they load or unload from bus
+        # commit before doing anything!!!
+        # think about counters hp is a count up on ticks the travel counts down make them consistant either up
+
+
+async def setroomname(arguments: CommandArguments):
     room_name = " ".join(arguments.argv)
     arguments.state.set_room_name(room_name)
 
 
-def setroomdesc(arguments: CommandArguments):
+async def setroomdesc(arguments: CommandArguments):
     print("Enter new room description")
     print("Type CLOSE on new line to finalize description")
     buffer = []
@@ -89,23 +110,23 @@ def setroomdesc(arguments: CommandArguments):
     arguments.state.room.desc = "\n\n".join(wrapped_paragraphs)
 
 
-def help(arguments):
+async def help(arguments):
     for key, value in commands.items():
         if not value.is_short_hand:
             print(value.syntax(key))
     return DO_NOT_PRINT
 
 
-def score(arguments: CommandArguments):
+async def score(arguments: CommandArguments):
     print(arguments.state.get_score())
     return DO_NOT_PRINT
 
 
-def quit(arguments: CommandArguments):
+async def quit(arguments: CommandArguments):
     return QUIT
 
 
-def make_mob(arguments: CommandArguments):
+async def make_mob(arguments: CommandArguments):
     name = arguments.argv[0]
     if len(arguments.argv) == 1:
         arguments.state.make_mob(name)
@@ -122,7 +143,7 @@ def make_mob(arguments: CommandArguments):
     return DO_NOT_PRINT
 
 
-def delete_room(arguments: CommandArguments):
+async def delete_room(arguments: CommandArguments):
     room_id = arguments.argv[0]
     arguments.state.delete_room(room_id)
 
@@ -133,19 +154,19 @@ def make_exit(arguments: CommandArguments):
     arguments.state.make_exit(direction, room_id)
 
 
-def search_room(arguments: CommandArguments):
+async def search_room(arguments: CommandArguments):
     print(arguments.state.search_rooms(" ".join(arguments.argv)))
     return DO_NOT_PRINT
 
 
 # makeroom function from game.py
-def makeroom(arguments: CommandArguments):
+async def makeroom(arguments: CommandArguments):
     todirection, fromdirection, *room_name_list = arguments.argv
     room_name = " ".join(room_name_list)
     arguments.state.make_roomc(room_name, todirection, fromdirection)
 
 
-def say(arguments: CommandArguments):
+async def say(arguments: CommandArguments):
     target = arguments.argv[0]
     conversation = arguments.state.say(target)
     if conversation:
@@ -155,21 +176,21 @@ def say(arguments: CommandArguments):
     return DO_NOT_PRINT
 
 
-def look(_: CommandArguments):
+async def look(_: CommandArguments):
     pass
 
 
-def vin(arguments: CommandArguments):
+async def vin(arguments: CommandArguments):
     print(arguments.state.campaign.room_id)
     return DO_NOT_PRINT
 
 
-def equipment(arguments: CommandArguments):
+async def equipment(arguments: CommandArguments):
     print(arguments.state.show_equipment())
     return DO_NOT_PRINT
 
 
-def inventory(arguments: CommandArguments):
+async def inventory(arguments: CommandArguments):
     print("Inventory:")
     items = arguments.state.campaign.inventory
     for held_item in items:
@@ -178,14 +199,26 @@ def inventory(arguments: CommandArguments):
     return DO_NOT_PRINT
 
 
-def make(arguments: CommandArguments):
+async def make(arguments: CommandArguments):
     type = arguments.argv[0].lower()
+    item: Item | None = None
+    match type:
+        case "armor":
+            item = Armor()
+
+        case "weapon":
+            item = Weapon()
+
+        case _:
+            return (None, None)
+
+    await item.fill(arguments.user_io)
     if not arguments.state.make(type):
         print(f"{type} not allowed")
     return DO_NOT_PRINT
 
 
-def spawn(arguments: CommandArguments):
+async def spawn(arguments: CommandArguments):
     search = arguments.argv[0]
     items = [
         (key, item)
@@ -212,21 +245,21 @@ def destroy(arguments: CommandArguments):
             arguments.state.room.items.remove(item)
 
 
-def drop(arguments: CommandArguments):
+async def drop(arguments: CommandArguments):
     item_input = " ".join(arguments.argv).lower()
     if not arguments.state.drop(item_input):
         print("You don't have that item")
         return DO_NOT_PRINT
 
 
-def get(arguments: CommandArguments):
+async def get(arguments: CommandArguments):
     item_input = " ".join(arguments.argv)
     if not arguments.state.get(item_input):
         print("That item is not here")
         return DO_NOT_PRINT
 
 
-def showstock(arguments: CommandArguments):
+async def showstock(arguments: CommandArguments):
     for mob in arguments.state.mobs:
         for location in mob.locations:
             if location.room_id == arguments.state.campaign.room_id:
@@ -236,7 +269,7 @@ def showstock(arguments: CommandArguments):
     return DO_NOT_PRINT
 
 
-def buy(arguments: CommandArguments):
+async def buy(arguments: CommandArguments):
     target = arguments.argv[0]
 
     if arguments.state.buy(target):
@@ -246,7 +279,7 @@ def buy(arguments: CommandArguments):
     return DO_NOT_PRINT
 
 
-def sell(arguments: CommandArguments):
+async def sell(arguments: CommandArguments):
     target = arguments.argv[0]
 
     if arguments.state.sell(target):
@@ -256,13 +289,15 @@ def sell(arguments: CommandArguments):
     return DO_NOT_PRINT
 
 
-def roomeffect(arguments: CommandArguments):
-    choice = get_choice("add which effect to this room", ["healing", "damaging"])
+async def roomeffect(arguments: CommandArguments):
+    choice = await arguments.user_io.get_choice(
+        "add which effect to this room", ["healing", "damaging"]
+    )
     prompt = "heal amount?" if choice == "healing" else "damaging amount?"
-    hpgain = get_number(prompt, is_non_negative)
+    hpgain = await arguments.user_io.get_number(prompt, is_non_negative)
     if choice == "damaging":
         hpgain = -hpgain
-    hptime = get_number("how often in seconds", is_positive)
+    hptime = await arguments.user_io.get_number("how often in seconds", is_positive)
     curroom = arguments.state.room
     curroom.hpgain = hpgain
     curroom.hptime = hptime
@@ -339,24 +374,24 @@ for command in list(commands.values()):
         commands[short_hand] = command.make_short_hand()
 
 
-def invoke(command_name, command, arguments):
+async def invoke(command_name, command: Command, arguments):
     if len(arguments.argv) < len(command.args):
         print("Not enough arguments")
         print(command.syntax(command_name))
         return DO_NOT_PRINT
     else:
-        return command.call_back(arguments)
+        return await command.call_back(arguments)
 
 
-def run_command(state: State, line: str):
+async def run_command(state: State, line: str, user_io: UserIO):
     command_line = line.split()
     if len(command_line) < 1:
         return DO_NOT_PRINT
     command_name, *argv = command_line
-    arguments = CommandArguments(state, argv)
+    arguments = CommandArguments(state, argv, user_io)
     if command_name in commands:
         command = commands[command_name]
-        return invoke(command_name, command, arguments)
+        return await invoke(command_name, command, arguments)
     if state.go_direction(command_name):
         return
     print("you can't go that way")

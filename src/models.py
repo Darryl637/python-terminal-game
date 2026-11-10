@@ -1,20 +1,15 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, PrivateAttr
 from typing import List, Literal, Union, Callable
 from src.constants import NEW_GAME, STATS, ROLLED_STATS
 from src.utility import (
-    set_state_with_line,
-    set_state_with_number,
-    set_state_with_choice,
     is_non_negative,
     is_valid,
     is_positive,
-    get_choice,
     generate_id,
     add_stats,
-    set_state_with_list,
-    set_state_with_dict,
 )
 from datetime import datetime, time
+from src.user_io import UserIO
 
 
 class HeldItem(BaseModel):
@@ -39,7 +34,7 @@ class Statistics(BaseModel):
     hitroll: int = 0
     damageroll: int = 0
     armor: int = 0
-    Hp: int = 500
+    Hp: int = 0
 
 
 class Character(Statistics):
@@ -61,20 +56,24 @@ class Campaign(BaseModel):
     characters: List[Character] = []
     name: str = ""
     room_id: str = ""
+    transport_id: str = ""
     character_count: int = 0
     flags: dict[str, bool] = {}
     inventory: List[HeldItem] = []
     gold: int = 100
     lastupdate: datetime = datetime.now()
+    ticks: int = 0
 
 
 class ItemBase(BaseModel):
     name: str = ""
     value: int = 0
 
-    def fill(self):
-        set_state_with_line(self, "name", "what is the item name")
-        set_state_with_number(self, "value", "how much is it worth", is_non_negative)
+    async def fill(self, user_io: UserIO):
+        await user_io.set_state_with_line(self, "name", "what is the item name")
+        await user_io.set_state_with_number(
+            self, "value", "how much is it worth", is_non_negative
+        )
 
 
 WearLocation = Literal["head", "torso", "waist", "legs", "hands", "feet", "arms"]
@@ -84,19 +83,27 @@ wear_locations = ["head", "torso", "waist", "legs", "hands", "feet", "arms"]
 class Combatable(ItemBase, Statistics):
     durability: int = 500
 
-    def fill(self):
-        super().fill()
-        set_state_with_number(self, "damageroll", "What is the damageroll", is_valid)
-        set_state_with_number(self, "hitroll", "What is the hitroll", is_valid)
-        set_state_with_number(self, "durability", "What is the durability", is_positive)
+    async def fill(self, user_io: UserIO):
+        await super().fill(user_io)
+        await user_io.set_state_with_number(
+            self, "damageroll", "What is the damageroll", is_valid
+        )
+        await user_io.set_state_with_number(
+            self, "hitroll", "What is the hitroll", is_valid
+        )
+        await user_io.set_state_with_number(
+            self, "durability", "What is the durability", is_positive
+        )
 
 
 class Wearable(Combatable):
     wear_location: WearLocation = "torso"
 
-    def fill(self):
-        super().fill()
-        set_state_with_choice(self, "wear_location", "Where is it worn", wear_locations)
+    async def fill(self, user_io: UserIO):
+        await super().fill(user_io)
+        await user_io.set_state_with_choice(
+            self, "wear_location", "Where is it worn", wear_locations
+        )
 
 
 LayerLocation = Literal["first", "second", "third", "forth", "fifth"]
@@ -108,19 +115,21 @@ class Armor(Wearable):
 
     layer_loc: LayerLocation = "first"
 
-    def fill(self):
-        super().fill()
-        set_state_with_choice(
+    async def fill(self, user_io: UserIO):
+        await super().fill(user_io)
+        await user_io.set_state_with_choice(
             self, "layer_loc", "what is the layer location", layer_locations
         )
-        set_state_with_number(self, "armor", "what is armor stat", is_non_negative)
+        await user_io.set_state_with_number(
+            self, "armor", "what is armor stat", is_non_negative
+        )
 
 
 class Weapon(Combatable):
     type: Literal["Weapon"] = "Weapon"
 
-    def fill(self):
-        super().fill()
+    async def fill(self, user_io: UserIO):
+        await super().fill(user_io)
 
 
 Item = Union[Armor, Weapon]
@@ -170,13 +179,15 @@ class MobConversation(BaseModel):
     set_flags: dict[str, bool] = {}
     visible_flags: dict[str, bool] = {}  # {"flag visible": False}
 
-    def fill(self):
-        set_state_with_line(self, "text", "what do you want them to say")
-        set_state_with_list(self, "item_ids", "what items ids should they have")
-        set_state_with_dict(
+    async def fill(self, user_io: UserIO):
+        await user_io.set_state_with_line(self, "text", "what do you want them to say")
+        await user_io.set_state_with_list(
+            self, "item_ids", "what items ids should they have"
+        )
+        await user_io.set_state_with_dict(
             self, "set_flags", "what flag should update after conversation"
         )
-        set_state_with_dict(
+        await user_io.set_state_with_dict(
             self, "visible_flags", "what flag are needed to have conversation"
         )
 
@@ -199,7 +210,23 @@ def mob_location_room(room_id: str):
     return inner
 
 
+class TransportRoom(BaseModel):
+    landing_room_id: str
+    ticks_parked: int
+    ticks_until_next_room: int
+
+
+class Transport(BaseModel):
+    id: str
+    name: str
+    room_index: int
+    is_docked: bool
+    ticks_remaining: int
+    rooms: List[TransportRoom] = []
+
+
 class State(BaseModel):
+    transports: List[Transport] = []
     campaigns: List[Campaign] = []
     rooms: dict[str, Room] = (
         ROOMS  # "Room" the quotes are saying to wait until file is loaded
@@ -280,6 +307,24 @@ class State(BaseModel):
                                 return True
         return False
 
+    def hp_change(self, ticks):
+        self.campaign.ticks += ticks
+        if self.campaign.ticks >= self.room.hptime:
+            for character in self.campaign.characters:
+                character.Hp += self.room.hpgain
+                character.Hp = max(0, min(character.max.Hp, character.Hp))
+            self.campaign.ticks = 0
+            if self.room.hpgain > 0:
+                return "You are healed"
+            if self.room.hpgain < 0:
+                return "You are damaged"
+
+    def show_inline_stats(self):
+        output = []
+        for character in self.characters:
+            output.append(f"{character.name}: {character.Hp}/{character.max.Hp}")
+        return ", ".join(output)
+
     def get_item_by_id(self, id: str):
         return self.items[id]
 
@@ -305,21 +350,9 @@ class State(BaseModel):
     def make(
         # dont format
         self,
-        type: str,
-        do_fill=True,
+        item: Item,
     ):
-        item: Item | None = None
-        match type:
-            case "armor":
-                item = Armor()
 
-            case "weapon":
-                item = Weapon()
-
-            case _:
-                return (None, None)
-        if do_fill:
-            item.fill()
         item_id = generate_id()
         self.items[item_id] = item
         return (
@@ -386,6 +419,7 @@ class State(BaseModel):
                 output.append("")
             output.append(f"-= Score for {character.name} =-")
             calculated_score = self.calculate_score(character)
+            print(calculated_score)
             for stat in STATS:
                 original_score = getattr(character, stat)
                 output.append(f"{stat[0:3]}: {original_score}|{calculated_score[stat]}")
@@ -430,6 +464,7 @@ class State(BaseModel):
                 room_id = a.room_id
 
                 self.campaign.room_id = room_id
+                self.campaign.ticks = 0
                 return True
         return False
 
@@ -439,14 +474,14 @@ class State(BaseModel):
         held_item.durability = item.durability
         self.room.items.append(held_item)
 
-    async def choose_campaign(self):
+    async def choose_campaign(self, user_io: UserIO):
         campaigns = self.campaigns or []
         options = ["New Game"]
         for campaign in campaigns:
             options.append(campaign.name)
-        option = await get_choice("Choose your campaign: ", options, True)
+        option = await user_io.get_choice("Choose your campaign: ", options, True)
         if option == NEW_GAME:
-            campaign = Campaign(name="Campaign " + str(option + len(options)))
+            campaign = Campaign(name="Campaign " + str(len(options)))
             campaigns.append(campaign)
             self.campaigns = campaigns
             # self.save_state()
@@ -480,3 +515,25 @@ class State(BaseModel):
                                     )
 
         return "\n".join(output)
+
+    def update_transports(self, ticks):
+        messages = []
+        for transport in self.transports:
+            transport.ticks_remaining -= ticks
+            if transport.ticks_remaining <= 0:
+                if transport.is_docked:
+                    transport_room = transport.rooms[transport.room_index]
+                    transport.is_docked = False
+                    transport.ticks_remaining = transport_room.ticks_until_next_room
+                    if self.campaign.room_id == transport_room.landing_room_id:
+                        messages.append(f"{transport.name} just left")
+                else:
+                    transport.room_index = (transport.room_index + 1) % len(
+                        transport.rooms
+                    )
+                    transport_room = transport.rooms[transport.room_index]
+                    transport.is_docked = True
+                    transport.ticks_remaining = transport_room.ticks_parked
+                    if self.campaign.room_id == transport_room.landing_room_id:
+                        messages.append(f"{transport.name} just arrived")
+        return "\n".join(messages)

@@ -25,6 +25,7 @@ from src.models import (
 )
 from unittest import mock
 import pytest
+import asyncio
 
 TEST_DIRECTION = "north"
 OTHER_ROOM_ID = "other room"
@@ -65,6 +66,7 @@ def dummy_state():
         torso=[layers, layers],
         head=[layers, layers],
         feet=[layers],
+        Hp=500,
     )
 
     state.campaigns.append(
@@ -121,28 +123,31 @@ def test__get_index__index_out_of_range():
     assert output == 5, "Invalid Index"
 
 
-def test__get_number__gets_a_number_first_try():
+@pytest.mark.asyncio
+async def test__get_number__gets_a_number_first_try():
     with mock.patch("builtins.input", return_value="7"):
         prompt = "Is working"
-        output = get_number(prompt)
+        output = await get_number(prompt)
         assert output == 7
 
 
-def test__get_number__validates_number():
+@pytest.mark.asyncio
+async def test__get_number__validates_number():
     with mock.patch("builtins.input", side_effect=["7", "NAN", "5"]):
         prompt = "Is working"
 
         def validator(number):
             return number <= 5
 
-        output = get_number(prompt, validator)
+        output = await get_number(prompt, validator)
         assert output == 5
 
 
+@pytest.mark.asyncio
 @mock.patch("builtins.input", side_effect=KeyboardInterrupt())
 @mock.patch("builtins.exit")
-def test__get_number__exits_program(mock_exit, mock_input):
-    get_number("exit prompt")
+async def test__get_number__exits_program(mock_exit, mock_input):
+    await get_number("exit prompt")
     mock_exit.assert_called_once_with(0)
 
 
@@ -151,44 +156,49 @@ class Dummy:
         self.zaboomafom = 4
 
 
-def test__set_state_with_line__has_value_skip():
+@pytest.mark.asyncio
+async def test__set_state_with_line__has_value_skip():
     d = Dummy()
-    set_state_with_line(d, "zaboomafom", "testwords", skip_if_has_value=True)
+    await set_state_with_line(d, "zaboomafom", "testwords", skip_if_has_value=True)
     assert d.zaboomafom == 4
 
 
-def test__set_state_with_line__stores_line():
+@pytest.mark.asyncio
+async def test__set_state_with_line__stores_line():
     user_input = "stringtopass"
-    path = "zaboomafom"
-    d = Dummy()
     with mock.patch("builtins.input", side_effect=[user_input]):
+        path = "zaboomafom"
         prompt = "testingwords"
         skip_if_has_value = False
-        set_state_with_line(d, path, prompt, skip_if_has_value)
+        d = Dummy()
+        await set_state_with_line(d, path, prompt, skip_if_has_value)
         assert d.zaboomafom == user_input
 
 
-def test__mob_conversation_fill():
+@pytest.mark.asyncio
+async def test__mob_conversation_fill():
     text = "Testing conversation"
     item_id = "conversation id"
     set_flags = {"healing": True}
     visible_flags = {"flag visible": False}
     conversation = MobConversation()
     with mock.patch(
-        "builtins.input",
-        side_effect=[
-            text,
-            item_id,
-            "",
-            "healing",
-            "on",
-            "",
-            "flag visible",
-            "noton",
-            "",  #
-        ],
+        "src.utility.async_input",
+        new=mock.AsyncMock(
+            side_effect=[
+                text,
+                item_id,
+                "",
+                "healing",
+                "on",
+                "",
+                "flag visible",
+                "noton",
+                "",  #
+            ],
+        ),
     ):
-        conversation.fill()
+        await conversation.fill()
         assert conversation.text == text
         assert conversation.item_ids == [item_id]
         assert conversation.set_flags == set_flags
@@ -201,7 +211,8 @@ def test__mob_conversation_fill():
 # Armor inherit
 
 
-def test__armor_fill__name():
+@pytest.mark.asyncio
+async def test__armor_fill__name():
     user_input = "namecheck"
     price = 5
     damageroll = 1
@@ -226,7 +237,7 @@ def test__armor_fill__name():
             armor,
         ],
     ):
-        item.fill()
+        await item.fill()
         assert item.name == user_input
         assert item.value == price
         assert item.damageroll == damageroll
@@ -238,18 +249,20 @@ def test__armor_fill__name():
         assert item.armor == armor
 
 
-def test__set_state_with_number__it_skips():
+@pytest.mark.asyncio
+async def test__set_state_with_number__it_skips():
     d = Dummy()
     path = "zaboomafom"
     prompt = "testingwords"
     skip_if_has_value = True
     with mock.patch("src.utility.get_number") as mock_get_number:
-        set_state_with_number(d, path, prompt, is_valid, skip_if_has_value)
+        await set_state_with_number(d, path, prompt, is_valid, skip_if_has_value)
         mock_get_number.assert_not_called()
     assert d.zaboomafom == 4
 
 
-def test__set_state_with_number__stores_number():
+@pytest.mark.asyncio
+async def test__set_state_with_number__stores_number():
     user_input = "3"
     path = "zaboomafom"
     d = Dummy()
@@ -258,7 +271,7 @@ def test__set_state_with_number__stores_number():
     with mock.patch("builtins.input", side_effect=[user_input]):
         prompt = "testingwords"
         skip_if_has_value = False
-        set_state_with_number(d, path, prompt, is_valid, skip_if_has_value)
+        await set_state_with_number(d, path, prompt, is_valid, skip_if_has_value)
         assert d.zaboomafom == int(user_input)
 
 
@@ -321,7 +334,9 @@ def test__state__get__drop(dummy_state):
 
 
 def test__state__get_score(dummy_state):
+    print(dummy_state.campaigns[0].characters[0].max.Hp)
     score = dummy_state.get_score()
+    print(dummy_state.campaigns[0].characters[0].max.Hp)
     assert score == "\n".join(
         [
             "-= Score for testname =-",
@@ -330,6 +345,7 @@ def test__state__get_score(dummy_state):
             "Wis: 3|3",
             "Int: 4|4",
             "Con: 5|5",
+            "Hp: 500|500",
             "dam: 0|0",
             "hit: 6|6",
             "arm: 8|8",
@@ -340,6 +356,7 @@ def test__state__get_score(dummy_state):
             "Wis: 3|3",
             "Int: 4|4",
             "Con: 5|5",
+            "Hp: 500|500",
             "dam: 0|0",
             "hit: 6|6",
             "arm: 8|8",

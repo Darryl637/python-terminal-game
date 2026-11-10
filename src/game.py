@@ -14,27 +14,25 @@ from src.models import (
 from src.constants import ROLLED_STATS
 from src.utility import (
     generate_id,
-    get_choice,
     get_index,
-    get_number,
-    set_state_with_line,
-    set_state_with_number,
     validate_campaign_player_count,
-    get_line,
 )
 from src.commands import run_command, DO_NOT_PRINT, QUIT
-
+from src.user_io import UserIO
 import hmr  # type: ignore[import-untyped]
 import asyncio
+import sys
 
 run_command = hmr.reload(run_command)
 
 
 class Game:
     state: State
+    user_io: UserIO
 
-    def __init__(self):
+    def __init__(self, user_io: UserIO):
         self.load_state()
+        self.user_io = user_io
 
     def get_room_name(self, action: Action) -> str:
 
@@ -45,11 +43,13 @@ class Game:
             return rooms[room_id].name
         return ""
 
+    is_running = True
+
     # make rooms save to json upon making room
     async def start(self):
-        await self.state.choose_campaign()  # -> magic -> function
+        await self.state.choose_campaign(self.user_io)  # -> magic -> function
         self.save_state()
-        await set_state_with_number(
+        await self.user_io.set_state_with_number(
             self.state.campaign,
             "character_count",
             "How many characters are in your campaign? (1-4)",
@@ -63,7 +63,7 @@ class Game:
             character = get_index(characters, i, Character())
             if i >= len(characters):
                 characters.append(character)
-            self.pick_stats(character)
+                await self.pick_stats(character)
         needsprompt = True
         while True:
             room_id = self.state.campaign.room_id
@@ -71,41 +71,52 @@ class Game:
             actions = self.get_actions()
             if needsprompt:
                 #            os.system("cls")
-                print(
+                self.user_io.print(
                     f"({room.name}) \n--------------------------------------------------------------------------------{Fore.RESET} "
                 )
-                print(
+                self.user_io.print(
                     f"{room.desc} \n--------------------------------------------------------------------------------"
                 )
 
-                print("Obvious exits: \n" + "\n".join(actions))
+                self.user_io.print("Obvious exits: \n" + "\n".join(actions))
 
-                print(
+                self.user_io.print(
                     "--------------------------------------------------------------------------------"
                 )
                 for mob in self.state.mobs:
                     for location in mob.locations:
                         if location.room_id == room_id:
-                            print(f"{mob.name} is in the room")
+                            self.user_io.print(f"{mob.name} is in the room")
                             break
 
                 for held_item in room.items:
                     item = self.state.get_item_by_id(held_item.item_id)
-                    print(Fore.GREEN + item.name)
-                print(
+                    self.user_io.print(Fore.GREEN + item.name)
+                self.user_io.print(
                     f"\n<Hp:{self.state.campaign.characters[0].Hp}/{self.state.campaign.characters[0].max.Hp}>-<Cr:{self.state.campaign.gold}>"
                 )
             needsprompt = True
 
-            line = await get_line(">")
-
-            result = run_command(state=self.state, line=line)
+            line = await self.user_io.get_line(">")
+            result = await run_command(self.state, line, self.user_io)
             if result == DO_NOT_PRINT:
                 needsprompt = False
             if result == QUIT:
                 break
 
             self.save_state()
+        self.is_running = False
+
+    async def background_task(self):
+        while self.is_running:
+            await asyncio.sleep(1)
+            message = self.state.hp_change(1)
+            if message:
+                self.user_io.print(message)
+                self.user_io.print(self.state.show_inline_stats())
+            message = self.state.update_transports(1)
+            if message:
+                self.user_io.print(message)
 
     def get_actions(self) -> List[str]:
         actions = []
@@ -116,24 +127,26 @@ class Game:
             actions.append(f"{key} - {room_name}")
         return actions
 
-    def pick_stats(self, character: Character):
+    async def pick_stats(self, character: Character):
         # When using self here does it mean the names in characters is the instance
-        set_state_with_line(character, "name", "What is your characters name?", True)
+        await self.user_io.set_state_with_line(
+            character, "name", "What is your characters name?", True
+        )
         self.save_state()
         character_name = character.name
         stat_pool = 575
         for stat in ROLLED_STATS:
-            already_allocated_stat = getattr(character, stat) or 0
+            already_allocated_stat = getattr(character.max, stat) or 0
             stat_pool = stat_pool - already_allocated_stat
 
         def validate_stat(stat: int):
             return 0 <= stat and stat <= stat_pool
 
         if stat_pool > 0:
-            print(f"Pick stats for {character_name}")
+            self.user_io.print(f"Pick stats for {character_name}")
             while stat_pool > 0:
                 for stat in ROLLED_STATS:
-                    value = get_number(
+                    value = self.user_io.get_number(
                         f"Pick your {stat} ({stat_pool} remaining points)",
                         validate_stat,
                     )

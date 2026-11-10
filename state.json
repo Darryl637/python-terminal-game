@@ -1,4 +1,20 @@
 {
+  "transports": [
+    {
+      "id": "asdgdsr",
+      "name": "public ferry",
+      "room_index": 0,
+      "is_docked": false,
+      "ticks_remaining": 2,
+      "rooms": [
+        {
+          "landing_room_id": "vnum0",
+          "ticks_parked": 10,
+          "ticks_until_next_room": 10
+        }
+      ]
+    }
+  ],
   "campaigns": [
     {
       "characters": [
@@ -11,7 +27,7 @@
           "hitroll": 0,
           "damageroll": 0,
           "armor": 0,
-          "Hp": 500,
+          "Hp": 325,
           "max": {
             "Strength": 0,
             "Dexterity": 0,
@@ -41,7 +57,7 @@
           "hitroll": 0,
           "damageroll": 0,
           "armor": 0,
-          "Hp": 500,
+          "Hp": 325,
           "max": {
             "Strength": 0,
             "Dexterity": 0,
@@ -64,7 +80,8 @@
         }
       ],
       "name": "Campaign 1",
-      "room_id": "3762d5f0-f03f-4651-a5ac-71b96d6e9b21",
+      "room_id": "fdbbf71f-4cbb-4f07-a454-f1cba1a7bd98",
+      "transport_id": "",
       "character_count": 2,
       "flags": {
         "got_item": true
@@ -84,7 +101,8 @@
         }
       ],
       "gold": 45,
-      "lastupdate": "2026-07-25T08:09:46.686641"
+      "lastupdate": "2026-07-25T08:09:46.686641",
+      "ticks": 0
     },
     {
       "characters": [
@@ -121,6 +139,7 @@
       ],
       "name": "Campaign 2",
       "room_id": "vnum0",
+      "transport_id": "",
       "character_count": 1,
       "flags": {
         "got_item": true
@@ -132,7 +151,8 @@
         }
       ],
       "gold": 100,
-      "lastupdate": "2026-07-25T08:09:46.686641"
+      "lastupdate": "2026-07-25T08:09:46.686641",
+      "ticks": 0
     }
   ],
   "rooms": {
@@ -163,7 +183,7 @@
       },
       "items": [],
       "hpgain": 0,
-      "hptime": 0
+      "hptime": 1
     },
     "f00a3557-cb49-4b9e-a9cc-5a35d7fb5fe0": {
       "name": "Coruscant Galactic Academy - Cafeteria",
@@ -193,6 +213,10 @@
         "north": {
           "action": "gotoroom",
           "room_id": "vnum0"
+        },
+        "south": {
+          "action": "gotoroom",
+          "room_id": "fdbbf71f-4cbb-4f07-a454-f1cba1a7bd98"
         }
       },
       "items": [],
@@ -222,8 +246,8 @@
         }
       },
       "items": [],
-      "hpgain": 0,
-      "hptime": 0
+      "hpgain": 1,
+      "hptime": 2
     },
     "12612dd2-13fc-40bb-a988-6ac9d50f6b93": {
       "name": "Coruscant Galactic Academy - Combat Annex",
@@ -248,8 +272,8 @@
         }
       },
       "items": [],
-      "hpgain": 0,
-      "hptime": 0
+      "hpgain": -1,
+      "hptime": 1
     },
     "3762d5f0-f03f-4651-a5ac-71b96d6e9b21": {
       "name": "Walk-In Freezer",
@@ -263,6 +287,36 @@
       "items": [],
       "hpgain": -1,
       "hptime": 5
+    },
+    "fdbbf71f-4cbb-4f07-a454-f1cba1a7bd98": {
+      "name": "Test-Landing-1",
+      "desc": "This is a small landing pad labeled 1 for testing.",
+      "actions": {
+        "north": {
+          "action": "gotoroom",
+          "room_id": "bb988e81-b58c-409c-a35e-787b73017a2f"
+        },
+        "south": {
+          "action": "gotoroom",
+          "room_id": "bdfbc1dd-b06c-45ae-bd27-801afa509322"
+        }
+      },
+      "items": [],
+      "hpgain": 0,
+      "hptime": 0
+    },
+    "bdfbc1dd-b06c-45ae-bd27-801afa509322": {
+      "name": "Test-Landing-2",
+      "desc": "This is a small landing pad labeled 2 for testing.",
+      "actions": {
+        "north": {
+          "action": "gotoroom",
+          "room_id": "fdbbf71f-4cbb-4f07-a454-f1cba1a7bd98"
+        }
+      },
+      "items": [],
+      "hpgain": 0,
+      "hptime": 0
     }
   },
   "campaign_index": 0,
