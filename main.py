@@ -8,13 +8,6 @@ from src.user_io import ConsoleUserIO, UserIO, TkUserIO
 async def main(user_io: UserIO):
     game = Game(user_io)
     await asyncio.gather(game.start(), game.background_task())
-    # Wait for the first task to finish
-    await asyncio.wait(
-        [
-            asyncio.create_task(game.start()),
-            asyncio.create_task(game.background_task()),
-        ],
-    )
 
 
 # from rich.console import Console

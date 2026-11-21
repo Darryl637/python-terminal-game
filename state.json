@@ -2,13 +2,37 @@
   "transports": [
     {
       "id": "asdgdsr",
-      "name": "public ferry",
+      "name": "Star Commuter 2000",
       "room_index": 0,
-      "is_docked": false,
-      "ticks_remaining": 2,
+      "is_docked": true,
+      "ticks_remaining": 4,
       "rooms": [
         {
-          "landing_room_id": "vnum0",
+          "landing_room_id": "fdbbf71f-4cbb-4f07-a454-f1cba1a7bd98",
+          "ticks_parked": 10,
+          "ticks_until_next_room": 10
+        },
+        {
+          "landing_room_id": "bdfbc1dd-b06c-45ae-bd27-801afa509322",
+          "ticks_parked": 10,
+          "ticks_until_next_room": 10
+        }
+      ]
+    },
+    {
+      "id": "plugus",
+      "name": "shuttle 1234",
+      "room_index": 0,
+      "is_docked": false,
+      "ticks_remaining": 4,
+      "rooms": [
+        {
+          "landing_room_id": "fdbbf71f-4cbb-4f07-a454-f1cba1a7bd98",
+          "ticks_parked": 10,
+          "ticks_until_next_room": 10
+        },
+        {
+          "landing_room_id": "bdfbc1dd-b06c-45ae-bd27-801afa509322",
           "ticks_parked": 10,
           "ticks_until_next_room": 10
         }
@@ -80,7 +104,7 @@
         }
       ],
       "name": "Campaign 1",
-      "room_id": "fdbbf71f-4cbb-4f07-a454-f1cba1a7bd98",
+      "room_id": "vnum0",
       "transport_id": "",
       "character_count": 2,
       "flags": {

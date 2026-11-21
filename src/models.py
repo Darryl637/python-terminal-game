@@ -525,7 +525,12 @@ class State(BaseModel):
                     transport_room = transport.rooms[transport.room_index]
                     transport.is_docked = False
                     transport.ticks_remaining = transport_room.ticks_until_next_room
-                    if self.campaign.room_id == transport_room.landing_room_id:
+                    if self.campaign.transport_id == transport.id:
+                        messages.append("Launching")
+                    elif (
+                        self.campaign.room_id == transport_room.landing_room_id
+                        and not self.campaign.transport_id
+                    ):
                         messages.append(f"{transport.name} just left")
                 else:
                     transport.room_index = (transport.room_index + 1) % len(
@@ -534,6 +539,11 @@ class State(BaseModel):
                     transport_room = transport.rooms[transport.room_index]
                     transport.is_docked = True
                     transport.ticks_remaining = transport_room.ticks_parked
-                    if self.campaign.room_id == transport_room.landing_room_id:
+                    if self.campaign.transport_id == transport.id:
+                        messages.append("Landing")
+                    elif (
+                        self.campaign.room_id == transport_room.landing_room_id
+                        and not self.campaign.transport_id
+                    ):
                         messages.append(f"{transport.name} just arrived")
         return "\n".join(messages)

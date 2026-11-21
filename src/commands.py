@@ -51,7 +51,7 @@ class Command:
         return f"Syntax: {command_name}{args} - {self.description}{short_hand}"
 
 
-async def boardferry(arguments: CommandArguments):
+async def board(arguments: CommandArguments):
     name = " ".join(command.args)
     transport = next(
         (
@@ -71,6 +71,20 @@ async def boardferry(arguments: CommandArguments):
         # dont update everytime the bus moved only when they load or unload from bus
         # commit before doing anything!!!
         # think about counters hp is a count up on ticks the travel counts down make them consistant either up
+
+
+async def leave(arguments: CommandArguments):
+
+    for transport in arguments.state.transports:
+        if (
+            transport.is_docked
+            and arguments.state.campaign.transport_id == transport.id
+        ):
+            arguments.state.campaign.transport_id = ""
+            arguments.state.campaign.room_id = transport.rooms[
+                transport.room_index
+            ].landing_room_id
+            break
 
 
 async def setroomname(arguments: CommandArguments):
@@ -362,6 +376,8 @@ commands = dict(
             "buy": Command(buy, description="purchase item", args=["<item>"]),
             "sell": Command(sell, description="sell item", args=["<item>"]),
             "roomeffect": Command(roomeffect, description="adds effect to room"),
+            "board": Command(board, description="board a vessel", args=["<vessel>"]),
+            "leave": Command(leave, description="exits a vessel"),
         }.items()
     )
 )

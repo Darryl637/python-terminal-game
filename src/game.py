@@ -69,6 +69,9 @@ class Game:
             room_id = self.state.campaign.room_id
             room = self.state.rooms[room_id]
             actions = self.get_actions()
+            if self.state.campaign.transport_id and needsprompt:
+                print("shuttle inside")
+                needsprompt = False
             if needsprompt:
                 #            os.system("cls")
                 self.user_io.print(
@@ -117,6 +120,7 @@ class Game:
             message = self.state.update_transports(1)
             if message:
                 self.user_io.print(message)
+                self.save_state()
 
     def get_actions(self) -> List[str]:
         actions = []
