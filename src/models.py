@@ -145,6 +145,7 @@ Action = GoToRoomAction
 
 
 class Room(BaseModel):
+    areatype: str = ""
     name: str = ""
     desc: str = ""
     actions: dict[str, Action] = {}
@@ -228,6 +229,7 @@ class Transport(BaseModel):
 class State(BaseModel):
     transports: List[Transport] = []
     campaigns: List[Campaign] = []
+    areas: list[str] = []
     rooms: dict[str, Room] = (
         ROOMS  # "Room" the quotes are saying to wait until file is loaded
     )
@@ -447,14 +449,18 @@ class State(BaseModel):
     def set_room_name(self, room_name: str):
         self.room.name = room_name
 
-    def make_roomc(self, room_name: str, todirection: str, fromdirection: str):
-        _, room = self.make_room(todirection, room_name)
-        room.actions[fromdirection] = GoToRoomAction(room_id=self.campaign.room_id)
+    def generate_id(self, areatype: str):
+        if areatype not in self.areas:
+            self.areas.append(areatype)
+        return generate_id()
 
-    def make_room(self, direction: str, room_name: str):
-        room_id = generate_id()
-        self.room.actions[direction] = GoToRoomAction(room_id=room_id)
-        room = Room(name=room_name, desc="", actions={})
+    def make_room(
+        self, room_name: str, todirection: str, fromdirection: str, areatype: str
+    ):
+        room_id = self.generate_id(areatype)
+        room = Room(name=room_name, desc="", actions={}, areatype=areatype)
+        self.room.actions[todirection] = GoToRoomAction(room_id=room_id)
+        room.actions[fromdirection] = GoToRoomAction(room_id=self.campaign.room_id)
         self.rooms[room_id] = room
         return room_id, room
 

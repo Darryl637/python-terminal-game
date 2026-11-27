@@ -175,9 +175,14 @@ async def search_room(arguments: CommandArguments):
 
 # makeroom function from game.py
 async def makeroom(arguments: CommandArguments):
-    todirection, fromdirection, *room_name_list = arguments.argv
-    room_name = " ".join(room_name_list)
-    arguments.state.make_roomc(room_name, todirection, fromdirection)
+    input_todirection = await arguments.user_io.get_line("direction to exit")
+    input_fromdirection = await arguments.user_io.get_line("direction of return exit")
+    input_roomname = await arguments.user_io.get_line("room name")
+    input_areatype = await arguments.user_io.get_line("area type")
+
+    arguments.state.make_room(
+        input_roomname, input_todirection, input_fromdirection, input_areatype
+    )
 
 
 async def say(arguments: CommandArguments):
@@ -283,6 +288,11 @@ async def showstock(arguments: CommandArguments):
     return DO_NOT_PRINT
 
 
+async def areas(arguments: CommandArguments):
+    print(arguments.state.areas)
+    return DO_NOT_PRINT
+
+
 async def buy(arguments: CommandArguments):
     target = arguments.argv[0]
 
@@ -345,7 +355,6 @@ commands = dict(
             "makeroom": Command(
                 makeroom,
                 description="todo",
-                args=["<todirection>", "<fromdirection>", "<room_name>"],
             ),
             "say": Command(
                 say, description="What do you want to say", args=["<target>"]
@@ -378,6 +387,7 @@ commands = dict(
             "roomeffect": Command(roomeffect, description="adds effect to room"),
             "board": Command(board, description="board a vessel", args=["<vessel>"]),
             "leave": Command(leave, description="exits a vessel"),
+            "areas": Command(areas, description="shows all area types"),
         }.items()
     )
 )

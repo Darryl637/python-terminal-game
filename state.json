@@ -4,8 +4,8 @@
       "id": "asdgdsr",
       "name": "Star Commuter 2000",
       "room_index": 0,
-      "is_docked": true,
-      "ticks_remaining": 4,
+      "is_docked": false,
+      "ticks_remaining": 5,
       "rooms": [
         {
           "landing_room_id": "fdbbf71f-4cbb-4f07-a454-f1cba1a7bd98",
@@ -22,9 +22,9 @@
     {
       "id": "plugus",
       "name": "shuttle 1234",
-      "room_index": 0,
-      "is_docked": false,
-      "ticks_remaining": 4,
+      "room_index": 1,
+      "is_docked": true,
+      "ticks_remaining": 5,
       "rooms": [
         {
           "landing_room_id": "fdbbf71f-4cbb-4f07-a454-f1cba1a7bd98",
@@ -104,7 +104,7 @@
         }
       ],
       "name": "Campaign 1",
-      "room_id": "vnum0",
+      "room_id": "e7b20f9f-edf6-4eb7-b084-70a41df2dd86",
       "transport_id": "",
       "character_count": 2,
       "flags": {
@@ -179,8 +179,12 @@
       "ticks": 0
     }
   ],
+  "areas": [
+    "Coruscant"
+  ],
   "rooms": {
     "vnum0": {
+      "areatype": "",
       "name": "Coruscant Galactic Academy - Grand Atrium",
       "desc": "Sunlight pours through towering transparisteel windows into the Grand Atrium of\nthe Coruscant Galactic Academy. Students and instructors from across the galaxy\nmove between halls leading to classrooms, simulators, and training facilities.\nHolographic directories hover above the polished floor, guiding newcomers to\ntheir destinations. The air hums with anticipation as every journey begins\nwithin these walls.",
       "actions": {
@@ -210,6 +214,7 @@
       "hptime": 1
     },
     "f00a3557-cb49-4b9e-a9cc-5a35d7fb5fe0": {
+      "areatype": "",
       "name": "Coruscant Galactic Academy - Cafeteria",
       "desc": "Long rows of tables fill the Academy Cafeteria as students and instructors pause\nbetween lessons to share meals and conversation. The aroma of freshly prepared\nfood drifts from serving stations where droids work tirelessly to keep hungry\nrecruits fed. Laughter, friendly debate, and the occasional boast about\nsimulator scores create a welcome contrast to the disciplined atmosphere found\nelsewhere in the Academy.",
       "actions": {
@@ -231,6 +236,7 @@
       "hptime": 0
     },
     "bb988e81-b58c-409c-a35e-787b73017a2f": {
+      "areatype": "",
       "name": "Coruscant Galactic Academy - Entrance Plaza",
       "desc": "A broad plaza stretches before the Academy, its polished stone alive with the\nfootsteps of students, travelers, and instructors. Speeders weave through the\ntraffic lanes high overhead while distant city sounds echo between towering\nskyscrapers. The Academy's towering entrance stands to the north, welcoming\nthose eager to begin their journey, while the streets of Coruscant continue\nsouth into the heart of the endless city.",
       "actions": {
@@ -248,6 +254,7 @@
       "hptime": 0
     },
     "537e52ef-4cbd-44ff-ad32-fdc2429183c8": {
+      "areatype": "",
       "name": "Coruscant Galactic Academy - Flight Simulator",
       "desc": "Rows of advanced flight simulators line the expansive training hall, each\nprojecting holographic starfields and distant worlds. Cadets practice takeoffs,\ndocking maneuvers, and hyperspace navigation under the watchful eyes of\nexperienced instructors. The steady hum of engines and computer systems fills\nthe room, reminding every recruit that mastering a starship is the first step\ntoward exploring the galaxy.",
       "actions": {
@@ -261,6 +268,7 @@
       "hptime": 0
     },
     "ad3e950d-1cf5-4d92-ae4e-bd61e5713093": {
+      "areatype": "",
       "name": "Coruscant Galactic Academy - Engineering Lab",
       "desc": "Workbenches filled with tools, circuit boards, and dismantled droids line the\nwalls of the Engineering Lab. Students carefully assemble components while\ninstructors demonstrate the principles of repair, fabrication, and maintenance.\nThe occasional burst of sparks and the whir of diagnostic equipment fill the\nair, reminding every recruit that a skilled engineer can keep both machines and\nstarships running when it matters most.",
       "actions": {
@@ -274,6 +282,7 @@
       "hptime": 2
     },
     "12612dd2-13fc-40bb-a988-6ac9d50f6b93": {
+      "areatype": "",
       "name": "Coruscant Galactic Academy - Combat Annex",
       "desc": "Reinforced walls and padded training areas fill the Combat Annex, where recruits\nhone their skills in controlled exercises. Practice remotes drift through the\nroom while training droids spar with cadets under the supervision of seasoned\ninstructors. The sharp crack of stun bolts and the clash of practice weapons\necho through the hall, reminding every student that discipline and preparation\nare as valuable as strength in battle.",
       "actions": {
@@ -287,6 +296,7 @@
       "hptime": 0
     },
     "05819d12-fcec-4492-a83c-b79b2d646dc6": {
+      "areatype": "",
       "name": "Bacta Tank",
       "desc": "",
       "actions": {
@@ -300,6 +310,7 @@
       "hptime": 1
     },
     "3762d5f0-f03f-4651-a5ac-71b96d6e9b21": {
+      "areatype": "",
       "name": "Walk-In Freezer",
       "desc": "",
       "actions": {
@@ -313,6 +324,7 @@
       "hptime": 5
     },
     "fdbbf71f-4cbb-4f07-a454-f1cba1a7bd98": {
+      "areatype": "",
       "name": "Test-Landing-1",
       "desc": "This is a small landing pad labeled 1 for testing.",
       "actions": {
@@ -330,12 +342,67 @@
       "hptime": 0
     },
     "bdfbc1dd-b06c-45ae-bd27-801afa509322": {
+      "areatype": "",
       "name": "Test-Landing-2",
       "desc": "This is a small landing pad labeled 2 for testing.",
       "actions": {
         "north": {
           "action": "gotoroom",
           "room_id": "fdbbf71f-4cbb-4f07-a454-f1cba1a7bd98"
+        },
+        "south": {
+          "action": "gotoroom",
+          "room_id": "385a583f-c3fd-4aca-8221-afb2615f1ba5"
+        }
+      },
+      "items": [],
+      "hpgain": 0,
+      "hptime": 0
+    },
+    "385a583f-c3fd-4aca-8221-afb2615f1ba5": {
+      "areatype": "Coruscant",
+      "name": "landing test3",
+      "desc": "",
+      "actions": {
+        "north": {
+          "action": "gotoroom",
+          "room_id": "bdfbc1dd-b06c-45ae-bd27-801afa509322"
+        },
+        "south": {
+          "action": "gotoroom",
+          "room_id": "01349c38-02ee-409c-8fe0-16a5b82ec853"
+        }
+      },
+      "items": [],
+      "hpgain": 0,
+      "hptime": 0
+    },
+    "01349c38-02ee-409c-8fe0-16a5b82ec853": {
+      "areatype": "Coruscant",
+      "name": "testroom",
+      "desc": "",
+      "actions": {
+        "north": {
+          "action": "gotoroom",
+          "room_id": "385a583f-c3fd-4aca-8221-afb2615f1ba5"
+        },
+        "south": {
+          "action": "gotoroom",
+          "room_id": "e7b20f9f-edf6-4eb7-b084-70a41df2dd86"
+        }
+      },
+      "items": [],
+      "hpgain": 0,
+      "hptime": 0
+    },
+    "e7b20f9f-edf6-4eb7-b084-70a41df2dd86": {
+      "areatype": "Coruscant",
+      "name": "testroom2",
+      "desc": "",
+      "actions": {
+        "north": {
+          "action": "gotoroom",
+          "room_id": "01349c38-02ee-409c-8fe0-16a5b82ec853"
         }
       },
       "items": [],
